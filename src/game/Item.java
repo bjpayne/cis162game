@@ -2,7 +2,7 @@ package game;
 
 /*****************************************************************
 The Item class.
-@author benjaminp
+@author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
 public class Item {
