@@ -28,15 +28,6 @@ public class Game extends Application {
 
         Controller controller = loader.getController();
 
-        for (Button button : controller.getButtons()) {
-            button.setDisable(true);
-        }
-
-        ProgressBar progressBar = controller.getProgressBar();
-
-        progressBar.setProgress(0.5);
-        progressBar.setStyle("-fx-accent: #ff342a;");
-
         primaryStage.setTitle("Game");
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
