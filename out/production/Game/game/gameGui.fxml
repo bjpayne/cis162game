@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <GridPane xmlns="http://javafx.com/javafx/8.0.111"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="game.Controller"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="game.GameGUI"
 >
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -42,7 +42,7 @@
 
     <TextArea fx:id="results" prefHeight="200.0" prefWidth="200.0"
               GridPane.columnSpan="6" GridPane.rowIndex="1"
-              GridPane.rowSpan="10"
+              GridPane.rowSpan="10" wrapText="true"
     >
         <GridPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -51,12 +51,20 @@
 
     <MenuBar GridPane.columnSpan="2147483647">
         <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" text="New Game"/>
-            <MenuItem mnemonicParsing="false" text="Close"/>
+            <MenuItem mnemonicParsing="false" text="New Game"
+                      onAction="#newGame"
+            />
+
+            <MenuItem mnemonicParsing="false" text="Close" onAction="#exit"/>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-            <MenuItem mnemonicParsing="false" text="How to play"/>
-            <MenuItem mnemonicParsing="false" text="About Game"/>
+            <MenuItem mnemonicParsing="false" text="How to play"
+                      onAction="#help"
+            />
+
+            <MenuItem mnemonicParsing="false" text="About Game"
+                      onAction="#about"
+            />
         </Menu>
     </MenuBar>
 
@@ -94,7 +102,23 @@
 
     <ProgressBar progress="0.0" GridPane.columnIndex="6"
                  GridPane.rowIndex="7" GridPane.valignment="CENTER"
-                 fx:id="progressBar"
+                 fx:id="healthBar"
+    />
+
+    <Label text="Details" GridPane.columnIndex="6"
+           GridPane.halignment="CENTER" GridPane.rowIndex="8"
+    />
+
+    <Label text="Weapon:" GridPane.columnIndex="6" fx:id="labelWeapon"
+           GridPane.halignment="CENTER" GridPane.rowIndex="9"
+    />
+
+    <Label text="Suspect:" GridPane.columnIndex="6" fx:id="labelSuspect"
+           GridPane.halignment="CENTER" GridPane.rowIndex="10"
+    />
+
+    <Label text="Location:" GridPane.columnIndex="6" fx:id="labelLocation"
+           GridPane.halignment="CENTER" GridPane.rowIndex="11"
     />
 
     <Label text="Actions" GridPane.halignment="LEFT" GridPane.rowIndex="11">
@@ -103,28 +127,30 @@
         </GridPane.margin>
     </Label>
 
-    <Button mnemonicParsing="false" prefWidth="80.0" text="Pickup"
-            GridPane.columnIndex="1" GridPane.halignment="CENTER"
+    <Button mnemonicParsing="false" onAction="#pickup" prefWidth="80.0"
+            text="Pickup" GridPane.columnIndex="1" GridPane.halignment="CENTER"
             GridPane.rowIndex="11" GridPane.valignment="CENTER"
+            fx:id="buttonPickup"
     />
 
-    <Button mnemonicParsing="false" prefWidth="80.0" text="Drop"
-            GridPane.columnIndex="2" GridPane.halignment="CENTER"
-            GridPane.rowIndex="11"
+    <Button mnemonicParsing="false" onAction="#drop" prefWidth="80.0"
+            text="Drop" GridPane.columnIndex="2" GridPane.halignment="CENTER"
+            GridPane.rowIndex="11" GridPane.valignment="CENTER"
+            fx:id="buttonDrop"
     />
 
-    <Button mnemonicParsing="false" prefWidth="80.0" text="Eat"
+    <Button mnemonicParsing="false" onAction="#eat" prefWidth="80.0" text="Eat"
             GridPane.columnIndex="3" GridPane.halignment="CENTER"
-            GridPane.rowIndex="11"
+            GridPane.rowIndex="11" fx:id="buttonEat"
     />
 
-    <Button mnemonicParsing="false" prefWidth="80.0" text="Look"
-            GridPane.columnIndex="4" GridPane.halignment="CENTER"
-            GridPane.rowIndex="11"
+    <Button mnemonicParsing="false" onAction="#look" prefWidth="80.0"
+            text="Look" GridPane.columnIndex="4" GridPane.halignment="CENTER"
+            GridPane.rowIndex="11" fx:id="buttonLook"
     />
 
-    <Button mnemonicParsing="false" prefWidth="80.0" text="Guess"
-            GridPane.columnIndex="5" GridPane.halignment="CENTER"
-            GridPane.rowIndex="11"
+    <Button mnemonicParsing="false" onAction="#guess" prefWidth="80.0"
+            text="Guess" GridPane.columnIndex="5" GridPane.halignment="CENTER"
+            GridPane.rowIndex="11" fx:id="buttonGuess"
     />
 </GridPane>

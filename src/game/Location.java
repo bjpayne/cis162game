@@ -45,14 +45,15 @@ public class Location {
     }
 
     /*****************************************************************
-    Initialize a new Item
+    Get the locations item
+    @return Item the locations item
     *****************************************************************/
     public Item getItem() {
         return item;
     }
 
     /*****************************************************************
-    Initialize a new Item
+    Add an item to the location
     *****************************************************************/
     public void addItem (Item item) {
         this.item = item;
@@ -60,13 +61,15 @@ public class Location {
 
     /*****************************************************************
     Check if the Location has an item
+    @return boolean whether the location has an item
     *****************************************************************/
     public boolean hasItem() {
         return this.getItem() == null;
     }
 
     /*****************************************************************
-    Initialize a new Item
+    Get the locations neighbors
+    @return HashMap the locations neighbors
     *****************************************************************/
     public HashMap<String, Location> getNeighbors() {
         return neighbors;

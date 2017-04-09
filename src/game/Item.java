@@ -16,21 +16,24 @@ public class Item {
     /** The items weight */
     private int weight;
 
-    /** Items edibility */
-    private boolean isEdible;
+    /** Items can be consumed */
+    private boolean isConsumable;
+
+    /** Items can be picked up */
+    private boolean isPickable;
 
     /*****************************************************************
     Initialize a new Item
     @param name The items name.
     @param description The items description.
     @param weight The items weight.
-    @param isEdible Whether the item is edible.
+    @param isConsumable Whether the item is edible.
     *****************************************************************/
     public Item (
         final String name,
         final String description,
         final int weight,
-        final boolean isEdible
+        final boolean isConsumable
     ) {
         this.name = name;
 
@@ -38,12 +41,12 @@ public class Item {
 
         this.weight = weight;
 
-        this.isEdible = isEdible;
+        this.isConsumable = isConsumable;
     }
 
     /*****************************************************************
     Get the items name
-    @return The items name
+    @return String The items name
     *****************************************************************/
     public String getName() {
         return name;
@@ -59,7 +62,7 @@ public class Item {
 
     /*****************************************************************
     Set the items description
-    @return the items description
+    @return String the items description
     *****************************************************************/
     public String getDescription() {
         return description;
@@ -75,7 +78,7 @@ public class Item {
 
     /*****************************************************************
     Get the items weight
-    @return the items weight
+    @return int the items weight
     *****************************************************************/
     public int getWeight() {
         return weight;
@@ -91,17 +94,33 @@ public class Item {
 
     /*****************************************************************
     Check whether the item is edible
-    @return whether the item is edible
+    @return boolean whether the item is edible
     *****************************************************************/
-    public boolean isEdible() {
-        return isEdible;
+    public boolean isConsumable() {
+        return this.isConsumable;
     }
 
     /*****************************************************************
-    Set the items edibility
-    @param edible whether the item is edible or not
+    Set whether the item is consumable
+    @param isConsumable whether the item is consumable
     *****************************************************************/
-    public void setEdible(boolean edible) {
-        isEdible = edible;
+    public void Consumable(final boolean isConsumable) {
+        this.isConsumable = isConsumable;
+    }
+
+    /*****************************************************************
+    Set whether the item is consumable
+    @return boolean whether the item is pickable
+    *****************************************************************/
+    public boolean isPickable() {
+        return this.isPickable;
+    }
+
+    /*****************************************************************
+    Set whether the item is pickable
+    @param isPickable whether the item is pickable
+    *****************************************************************/
+    public void setPickable(boolean isPickable) {
+        this.isPickable = isPickable;
     }
 }
