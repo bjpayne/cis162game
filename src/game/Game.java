@@ -107,7 +107,7 @@ public class Game extends Application {
     /*****************************************************************
     Move the player
     *****************************************************************/
-    public static void move (String direction) {
-        //
+    public static void move (Location location) {
+        currentLocation = location;
     }
 }

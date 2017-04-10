@@ -1,5 +1,6 @@
 package game;
 
+import com.njkremer.Sqlite.SqlStatement;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -61,7 +62,13 @@ public class GameGUI {
     Move the player up
     *****************************************************************/
     @FXML protected void directionUp() {
-        Game.move("up");
+        try {
+            Location location = SqlStatement.select(Location.class).where("id").eq(Game.currentLocation.getId());
+
+            Game.move("up");
+        } catch (Exception e) {
+            System.out.print(e);
+        }
     }
 
     /*****************************************************************
