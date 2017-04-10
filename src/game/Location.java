@@ -1,5 +1,8 @@
 package game;
 
+import com.njkremer.Sqlite.Annotations.AutoIncrement;
+import com.njkremer.Sqlite.Annotations.PrimaryKey;
+
 import java.util.HashMap;
 
 /*****************************************************************
@@ -8,7 +11,10 @@ The Location class.
 @version 4/4/2017.
 ******************************************************************/
 public class Location {
-
+    /** The locations id */
+    @AutoIncrement
+    @PrimaryKey
+    private long id;
     /** The location description */
     private String description;
 
@@ -38,7 +44,24 @@ public class Location {
     }
 
     /*****************************************************************
-    Initialize a new Item
+    Get the locations id
+    @return long the locations id
+    *****************************************************************/
+    public long getId() {
+        return this.id;
+    }
+
+    /*****************************************************************
+    Set the locations id
+    @param long the locations id
+    *****************************************************************/
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    /*****************************************************************
+    Get the locations description
+    @return String the locations description
     *****************************************************************/
     public String getDescription() {
         return description;

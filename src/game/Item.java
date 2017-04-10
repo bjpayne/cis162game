@@ -1,11 +1,18 @@
 package game;
 
+import com.njkremer.Sqlite.Annotations.AutoIncrement;
+import com.njkremer.Sqlite.Annotations.PrimaryKey;
+
 /*****************************************************************
 The Item class.
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
 public class Item {
+    /** The items id */
+    @AutoIncrement
+    @PrimaryKey
+    private long id;
 
     /** The items name */
     private String name;
@@ -42,6 +49,22 @@ public class Item {
         this.weight = weight;
 
         this.isConsumable = isConsumable;
+    }
+
+    /*****************************************************************
+    Get the items id
+    @return Long The items id
+    *****************************************************************/
+    public long getId() {
+        return this.id;
+    }
+
+    /*****************************************************************
+    Get the items id
+    @param Long The items id
+    *****************************************************************/
+    public void setId(final long id) {
+        this.id = id;
     }
 
     /*****************************************************************
@@ -96,7 +119,7 @@ public class Item {
     Check whether the item is edible
     @return boolean whether the item is edible
     *****************************************************************/
-    public boolean isConsumable() {
+    public boolean getIsConsumable() {
         return this.isConsumable;
     }
 
@@ -104,7 +127,7 @@ public class Item {
     Set whether the item is consumable
     @param isConsumable whether the item is consumable
     *****************************************************************/
-    public void Consumable(final boolean isConsumable) {
+    public void setIsConsumable(final boolean isConsumable) {
         this.isConsumable = isConsumable;
     }
 
@@ -112,7 +135,7 @@ public class Item {
     Set whether the item is consumable
     @return boolean whether the item is pickable
     *****************************************************************/
-    public boolean isPickable() {
+    public boolean getIsPickable() {
         return this.isPickable;
     }
 
@@ -120,7 +143,7 @@ public class Item {
     Set whether the item is pickable
     @param isPickable whether the item is pickable
     *****************************************************************/
-    public void setPickable(boolean isPickable) {
+    public void setIsPickable(boolean isPickable) {
         this.isPickable = isPickable;
     }
 }

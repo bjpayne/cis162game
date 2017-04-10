@@ -61,28 +61,28 @@ public class GameGUI {
     Move the player up
     *****************************************************************/
     @FXML protected void directionUp() {
-        this.setResults("direction up");
+        Game.move("up");
     }
 
     /*****************************************************************
     Move the player down
     ******************************************************************/
     @FXML protected void directionDown() {
-        this.setResults("direction down");
+        Game.move("down");
     }
 
     /*****************************************************************
     Move the player left
     ******************************************************************/
     @FXML protected void directionLeft() {
-        this.setResults("direction left");
+        Game.move("left");
     }
 
     /*****************************************************************
     Move the player right
     ******************************************************************/
     @FXML protected void directionRight() {
-        this.setResults("direction right");
+        Game.move("right");
     }
 
     /*****************************************************************
