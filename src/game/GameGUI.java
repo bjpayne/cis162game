@@ -61,11 +61,7 @@ public class GameGUI {
     Move the player up
     *****************************************************************/
     @FXML protected void directionUp() {
-        try {
-            // Game.move();
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-        }
+        this.results.appendText("");
     }
 
     /*****************************************************************
@@ -172,17 +168,12 @@ public class GameGUI {
     Get the buttons
     @return ArrayList the gui buttons
     ******************************************************************/
-    public ArrayList<Button> getButtons() {
+    public ArrayList<Button> getMovementButtons() {
         return new ArrayList<>(Arrays.asList(
             buttonUp,
             buttonDown,
             buttonLeft,
-            buttonRight,
-            buttonPickup,
-            buttonDrop,
-            buttonLook,
-            buttonEat,
-            buttonGuess
+            buttonRight
         ));
     }
 
