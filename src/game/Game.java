@@ -1,7 +1,9 @@
 package game;
 
-import com.njkremer.Sqlite.DataConnectionManager;
-import com.njkremer.Sqlite.SqlStatement;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.support.ConnectionSource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -30,8 +32,8 @@ public class Game extends Application {
     /** The game locations neighboring locations */
     private HashMap<Location, Location> locationsNeighbors;
 
-    /** The players current location */
-    private static Location currentLocation;
+    /** The Location Dao */
+    Dao<Location, Integer> locationDao;
 
     /*****************************************************************
     Start the GUI
@@ -40,21 +42,31 @@ public class Game extends Application {
     *****************************************************************/
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("gameGui.fxml"));
-
-        Parent root = loader.load();
-
-        this.controller = loader.getController();
-
         try {
-            DataConnectionManager.init("game.db");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("gameGui.fxml"));
+
+            Parent root = loader.load();
+
+            this.controller = loader.getController();
+
+            ConnectionSource connectionSource = new JdbcConnectionSource(
+                "jdbc:sqlite:" +
+                this.getClass().getResource("game.db").getPath()
+            );
+
+            locationDao = DaoManager.createDao(
+                connectionSource,
+                Location.class
+            );
+
+            createWorld();
+
+            primaryStage.setTitle("Game");
+            primaryStage.setScene(new Scene(root, 800, 500));
+            primaryStage.show();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        primaryStage.setTitle("Game");
-        primaryStage.setScene(new Scene(root, 800, 500));
-        primaryStage.show();
     }
 
     /*****************************************************************
@@ -70,24 +82,14 @@ public class Game extends Application {
     *****************************************************************/
     private void createWorld() {
         try {
-            this.items = SqlStatement.select(Item.class).getList();
+            // this.items = SqlStatement.select(Item.class).getList();
 
-            this.locations = SqlStatement.select(Location.class).getList();
+            this.locations = locationDao.queryForAll();
 
             for (Location location : this.locations) {
-                LocationNeighbors locationNeighbor = SqlStatement
-                    .select(LocationNeighbors.class)
-                    .where("location_id")
-                    .eq(location.getId())
-                    .getFirst();
-
-                Location neighbor = SqlStatement
-                    .select(Location.class)
-                    .where("id")
-                    .eq(locationNeighbor.getLocation_id())
-                    .getFirst();
-
-                this.locationsNeighbors.put(location, neighbor);
+                this.controller
+                    .getResults()
+                    .appendText(location.getName() + System.lineSeparator());
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -102,12 +104,5 @@ public class Game extends Application {
             "Welcome to the game." +
             "Click Help->How to play to learn how to play the game."
         );
-    }
-
-    /*****************************************************************
-    Move the player
-    *****************************************************************/
-    public static void move (Location location) {
-        currentLocation = location;
     }
 }

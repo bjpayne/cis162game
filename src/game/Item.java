@@ -1,8 +1,5 @@
 package game;
 
-import com.njkremer.Sqlite.Annotations.AutoIncrement;
-import com.njkremer.Sqlite.Annotations.PrimaryKey;
-
 /*****************************************************************
 The Item class.
 @author Ben Payne
@@ -10,8 +7,6 @@ The Item class.
 ******************************************************************/
 public class Item {
     /** The items id */
-    @AutoIncrement
-    @PrimaryKey
     private long id;
 
     /** The items name */

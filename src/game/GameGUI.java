@@ -1,6 +1,5 @@
 package game;
 
-import com.njkremer.Sqlite.SqlStatement;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -63,11 +62,9 @@ public class GameGUI {
     *****************************************************************/
     @FXML protected void directionUp() {
         try {
-            Location location = SqlStatement.select(Location.class).where("id").eq(Game.currentLocation.getId());
-
-            Game.move("up");
+            // Game.move();
         } catch (Exception e) {
-            System.out.print(e);
+            System.out.print(e.getMessage());
         }
     }
 
@@ -75,21 +72,21 @@ public class GameGUI {
     Move the player down
     ******************************************************************/
     @FXML protected void directionDown() {
-        Game.move("down");
+        // Game.move();
     }
 
     /*****************************************************************
     Move the player left
     ******************************************************************/
     @FXML protected void directionLeft() {
-        Game.move("left");
+        // Game.move("left");
     }
 
     /*****************************************************************
     Move the player right
     ******************************************************************/
     @FXML protected void directionRight() {
-        Game.move("right");
+        // Game.move("right");
     }
 
     /*****************************************************************

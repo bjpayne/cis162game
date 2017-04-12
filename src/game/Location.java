@@ -1,7 +1,7 @@
 package game;
 
-import com.njkremer.Sqlite.Annotations.AutoIncrement;
-import com.njkremer.Sqlite.Annotations.PrimaryKey;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.HashMap;
 
@@ -10,19 +10,30 @@ The Location class.
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
+@DatabaseTable(tableName = "location")
 public class Location {
-    /** The locations id */
-    @AutoIncrement
-    @PrimaryKey
+    /** The primary id key */
+    @DatabaseField(id = true)
     private long id;
+
     /** The location description */
+    @DatabaseField()
     private String description;
+
+    /** The location name */
+    @DatabaseField()
+    private String name;
 
     /** The locations item */
     private Item item = null;
 
     /** The locations neighbors */
     private HashMap<String, Location> neighbors;
+
+    /*****************************************************************
+    ORM Constructor
+    *****************************************************************/
+    Location () {}
 
     /*****************************************************************
     Initialize a new Item
@@ -96,5 +107,21 @@ public class Location {
     *****************************************************************/
     public HashMap<String, Location> getNeighbors() {
         return neighbors;
+    }
+
+    /*****************************************************************
+    Get the locations name
+    @return HashMap the locations neighbors
+    *****************************************************************/
+    public String getName() {
+        return name;
+    }
+
+    /*****************************************************************
+    Set the locations name
+    @return string the locations name
+    *****************************************************************/
+    public void setName(String name) {
+        this.name = name;
     }
 }
