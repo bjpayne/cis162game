@@ -33,7 +33,7 @@ public class Game extends Application {
     private HashMap<Location, Location> locationsNeighbors;
 
     /** The Location Dao */
-    Dao<Location, Integer> locationDao;
+    private Dao<Location, Integer> locationDao;
 
     /*****************************************************************
     Start the GUI

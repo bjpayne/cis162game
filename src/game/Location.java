@@ -119,7 +119,7 @@ public class Location {
 
     /*****************************************************************
     Set the locations name
-    @return string the locations name
+    @param String the locations name
     *****************************************************************/
     public void setName(String name) {
         this.name = name;
