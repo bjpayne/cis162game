@@ -12,6 +12,10 @@ The Location class.
 ******************************************************************/
 @DatabaseTable(tableName = "location")
 public class Location {
+
+    /** Query builder */
+    static final String ID_COLUMN = "id";
+
     /** The primary id key */
     @DatabaseField(id = true)
     private long id;

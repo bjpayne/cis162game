@@ -1,16 +1,36 @@
 package game;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable(tableName = "suspect")
 public class Suspect {
+    @DatabaseField(id = true)
+    private int id;
 
     /** The Characters name */
+    @DatabaseField()
     private String name;
 
     /*****************************************************************
-    Initialize a new Suspect
-    @param name The items name.
+    ORM Constructor
     *****************************************************************/
-    public Suspect(final String name) {
-        this.name = name;
+    public Suspect() {}
+
+    /*****************************************************************
+    Get the suspect primary key
+    @return String the characters name
+    *****************************************************************/
+    public int getId() {
+        return id;
+    }
+
+    /*****************************************************************
+    Set the suspect primary key
+    @param id the suspect id
+    *****************************************************************/
+    public void setId(int id) {
+        this.id = id;
     }
 
     /*****************************************************************

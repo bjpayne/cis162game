@@ -1,28 +1,47 @@
 package game;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 /*****************************************************************
 The Item class.
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
+@DatabaseTable(tableName = "item")
 public class Item {
     /** The items id */
+    @DatabaseField(id = true)
     private long id;
 
     /** The items name */
+    @DatabaseField()
     private String name;
 
     /** The items description */
+    @DatabaseField()
     private String description;
 
     /** The items weight */
+    @DatabaseField()
     private int weight;
 
     /** Items can be consumed */
+    @DatabaseField()
     private boolean isConsumable;
 
     /** Items can be picked up */
+    @DatabaseField()
     private boolean isPickable;
+
+    /** Items health value */
+    @DatabaseField()
+    private int healthValue;
+
+    /*****************************************************************
+    ORM Constructor
+    *****************************************************************/
+    Item () {}
 
     /*****************************************************************
     Initialize a new Item
@@ -56,7 +75,7 @@ public class Item {
 
     /*****************************************************************
     Get the items id
-    @param Long The items id
+    @param id The items id
     *****************************************************************/
     public void setId(final long id) {
         this.id = id;
@@ -140,5 +159,21 @@ public class Item {
     *****************************************************************/
     public void setIsPickable(boolean isPickable) {
         this.isPickable = isPickable;
+    }
+
+    /*****************************************************************
+    Get the items health value
+    @return int the items health value
+    *****************************************************************/
+    public int getHealthValue() {
+        return this.healthValue;
+    }
+
+    /*****************************************************************
+    Set the items health value
+    @param healthValue the items health value
+    *****************************************************************/
+    public void setHealthValue(final int healthValue) {
+        this.healthValue = healthValue;
     }
 }
