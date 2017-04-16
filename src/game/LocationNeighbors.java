@@ -4,29 +4,21 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /*****************************************************************
-The Location class.
+Model the location_neighbor lookup table
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
 @DatabaseTable(tableName = "location_neighbors")
 public class LocationNeighbors {
-
-    /** Query builder fields */
-    static final String LOCATION_ID = "location_id";
-
-    public static final String NEIGHBOR_ID = "neighbor_id";
-
-    static final String DIRECTION = "direction";
-
     /** The primary key */
     @DatabaseField(id = true)
     private int id;
 
-    /** The location id */
+    /** The  id */
     @DatabaseField()
     private int location_id;
 
-    /** The neighboring location id */
+    /** The neighboring  id */
     @DatabaseField()
     private int neighbor_id;
 
@@ -38,8 +30,12 @@ public class LocationNeighbors {
     @DatabaseField()
     private String direction;
 
+    /** Query builder accessors */
+    static final String LOCATION_ID = "location_id";
+    static final String DIRECTION = "direction";
+
     /*****************************************************************
-    ORM Constructor
+    Model Constructor
     *****************************************************************/
     LocationNeighbors () {}
 
@@ -52,7 +48,7 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Get the location id
+    Get the  id
     @return int The locations id
     *****************************************************************/
     public int getLocationId() {
@@ -60,7 +56,7 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Set the location id
+    Set the  id
     @param location_id the locations id
     *****************************************************************/
     public void setLocationId(final int location_id) {
@@ -68,7 +64,7 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Get the neighboring location id
+    Get the neighboring  id
     @return int the neighboring locations id
     *****************************************************************/
     public int getNeighborId() {
@@ -76,7 +72,7 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Set the location neighbor ID
+    Set the  neighbor ID
     @param neighbor_id the neighbors Id
     *****************************************************************/
     public void setNeighborId(final int neighbor_id) {
@@ -84,8 +80,8 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Get the location neighbor relationship description
-    @return String the location neighbor relationship description
+    Get the  neighbor relationship description
+    @return String the  neighbor relationship description
     *****************************************************************/
     public String getDescription() {
         return this.description;

@@ -2,29 +2,26 @@ package game;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import javafx.scene.control.ChoiceBox;
 
 import java.util.HashMap;
 
 /*****************************************************************
-The Location class.
+Model the  table.
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
 @DatabaseTable(tableName = "location")
-public class Location {
-
-    /** Query builder */
-    static final String ID_COLUMN = "id";
-
+public class Location implements GameObjectInterface {
     /** The primary id key */
     @DatabaseField(id = true)
     private long id;
 
-    /** The location description */
+    /** The  description */
     @DatabaseField()
     private String description;
 
-    /** The location name */
+    /** The  name */
     @DatabaseField()
     private String name;
 
@@ -35,13 +32,13 @@ public class Location {
     private HashMap<String, Location> neighbors;
 
     /*****************************************************************
-    ORM Constructor
+    Model Constructor
     *****************************************************************/
     Location () {}
 
     /*****************************************************************
     Initialize a new Item
-    @param description The location description.
+    @param description The  description.
     *****************************************************************/
     public Location(final String description) {
         this.description = description;
@@ -68,7 +65,7 @@ public class Location {
 
     /*****************************************************************
     Set the locations id
-    @param long the locations id
+    @param id the locations id
     *****************************************************************/
     public void setId(final long id) {
         this.id = id;
@@ -92,6 +89,7 @@ public class Location {
 
     /*****************************************************************
     Add an item to the location
+    @param item the item to add to the location
     *****************************************************************/
     public void addItem (Item item) {
         this.item = item;
@@ -99,7 +97,7 @@ public class Location {
 
     /*****************************************************************
     Check if the Location has an item
-    @return boolean whether the location has an item
+    @return boolean whether the  has an item
     *****************************************************************/
     public boolean hasItem() {
         return this.getItem() == null;
@@ -119,6 +117,11 @@ public class Location {
     *****************************************************************/
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean belongsTo(ChoiceBox<String> choice) {
+        return choice.getId().equals("locationChoiceBox");
     }
 
     /*****************************************************************

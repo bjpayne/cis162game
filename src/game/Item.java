@@ -2,6 +2,7 @@ package game;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import javafx.scene.control.ChoiceBox;
 
 /*****************************************************************
 The Item class.
@@ -9,7 +10,7 @@ The Item class.
 @version 4/4/2017.
 ******************************************************************/
 @DatabaseTable(tableName = "item")
-public class Item {
+public class Item implements GameObjectInterface {
     /** The items id */
     @DatabaseField(id = true)
     private long id;
@@ -22,48 +23,29 @@ public class Item {
     @DatabaseField()
     private String description;
 
-    /** The items weight */
-    @DatabaseField()
-    private int weight;
-
     /** Items can be consumed */
-    @DatabaseField()
+    @DatabaseField(columnName = "is_consumable")
     private boolean isConsumable;
 
     /** Items can be picked up */
-    @DatabaseField()
+    @DatabaseField(columnName = "is_pickable")
     private boolean isPickable;
 
     /** Items health value */
-    @DatabaseField()
+    @DatabaseField(columnName = "health_value")
     private int healthValue;
 
+    /** Items health value */
+    @DatabaseField()
+    private boolean solvable;
+
+    /** Query builder accessors */
+    static final String SOLVABLE = "solvable";
+
     /*****************************************************************
-    ORM Constructor
+    Model Constructor
     *****************************************************************/
     Item () {}
-
-    /*****************************************************************
-    Initialize a new Item
-    @param name The items name.
-    @param description The items description.
-    @param weight The items weight.
-    @param isConsumable Whether the item is edible.
-    *****************************************************************/
-    public Item (
-        final String name,
-        final String description,
-        final int weight,
-        final boolean isConsumable
-    ) {
-        this.name = name;
-
-        this.description = description;
-
-        this.weight = weight;
-
-        this.isConsumable = isConsumable;
-    }
 
     /*****************************************************************
     Get the items id
@@ -89,6 +71,11 @@ public class Item {
         return name;
     }
 
+    @Override
+    public boolean belongsTo(ChoiceBox<String> choice) {
+        return choice.getId().equals("itemChoiceBox");
+    }
+
     /*****************************************************************
     Set the items name
     @param name The items name
@@ -111,22 +98,6 @@ public class Item {
     *****************************************************************/
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /*****************************************************************
-    Get the items weight
-    @return int the items weight
-    *****************************************************************/
-    public int getWeight() {
-        return weight;
-    }
-
-    /*****************************************************************
-    Set the items weight
-    @param weight the items weight
-    *****************************************************************/
-    public void setWeight(int weight) {
-        this.weight = weight;
     }
 
     /*****************************************************************
@@ -157,7 +128,7 @@ public class Item {
     Set whether the item is pickable
     @param isPickable whether the item is pickable
     *****************************************************************/
-    public void setIsPickable(boolean isPickable) {
+    public void setIsPickable(final boolean isPickable) {
         this.isPickable = isPickable;
     }
 
@@ -175,5 +146,21 @@ public class Item {
     *****************************************************************/
     public void setHealthValue(final int healthValue) {
         this.healthValue = healthValue;
+    }
+
+    /*****************************************************************
+    Get whether the item can solve the mystery
+    @return boolean whether the item solved the mystery
+    *****************************************************************/
+    public boolean getSolvable() {
+        return solvable;
+    }
+
+    /*****************************************************************
+    Set the items health value
+    @param solvable whether the item solves the mystery
+    *****************************************************************/
+    public void setSolvable(final boolean solvable) {
+        this.solvable = solvable;
     }
 }

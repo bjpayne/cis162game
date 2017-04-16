@@ -2,15 +2,22 @@ package game;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import javafx.scene.control.ChoiceBox;
 
+/*****************************************************************
+Model the suspects table.
+@author Ben Payne
+@version 4/4/2017.
+******************************************************************/
 @DatabaseTable(tableName = "suspect")
-public class Suspect {
+public class Suspect implements GameObjectInterface {
     @DatabaseField(id = true)
-    private int id;
+    private long id;
 
     /** The Characters name */
     @DatabaseField()
     private String name;
+
 
     /*****************************************************************
     ORM Constructor
@@ -21,7 +28,7 @@ public class Suspect {
     Get the suspect primary key
     @return String the characters name
     *****************************************************************/
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -29,7 +36,7 @@ public class Suspect {
     Set the suspect primary key
     @param id the suspect id
     *****************************************************************/
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -41,10 +48,19 @@ public class Suspect {
     }
 
     /*****************************************************************
-    Get the suspects name
-    @return String the characters name
+    get the suspects name
+    @return string the characters name
     *****************************************************************/
     public String getName() {
         return name;
+    }
+
+    /*****************************************************************
+    Check if the selected Suspect is correct
+    @return boolean whether its correct
+    *****************************************************************/
+    @Override
+    public boolean belongsTo(ChoiceBox<String> choice) {
+        return choice.getId().equals("suspectChoiceBox");
     }
 }

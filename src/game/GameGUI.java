@@ -2,10 +2,12 @@ package game;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -27,105 +29,93 @@ public class GameGUI {
     /** Direction Right Button */
     @FXML private Button buttonRight;
 
-    /** Direction Right Button */
+    /** Pickup Button */
     @FXML private Button buttonPickup;
 
-    /** Direction Right Button */
+    /** Drop Button */
     @FXML private Button buttonDrop;
 
-    /** Direction Right Button */
+    /** Eat Button */
     @FXML private Button buttonEat;
 
-    /** Direction Right Button */
+    /** Look Button */
     @FXML private Button buttonLook;
 
-    /** Direction Right Button */
+    /** Guess Button */
     @FXML private Button buttonGuess;
 
+    /** Solve Button */
+    @FXML private Button buttonSolve;
+
     /** Results text area */
-    @FXML private TextArea results;
+    @FXML private WebView results;
 
     /** Health Progress bar */
     @FXML private ProgressBar healthBar;
 
-    /** Health Progress bar */
-    @FXML private Label labelWeapon;
+    /** Suspect Text */
+    @FXML private Text suspectGuess;
 
-    /** Health Progress bar */
-    @FXML private Label labelSuspect;
+    /** Location Text */
+    @FXML private Text locationGuess;
 
-    /** Health Progress bar */
-    @FXML private Label labelLocation;
+    /** Item Text */
+    @FXML private Text itemGuess;
 
     /*****************************************************************
     Move the player up
     *****************************************************************/
-    @FXML protected void directionUp() {
-        this.results.appendText("");
-    }
+    @FXML protected void directionUp() {}
 
     /*****************************************************************
     Move the player down
     ******************************************************************/
-    @FXML protected void directionDown() {
-        // Game.move();
-    }
+    @FXML protected void directionDown() {}
 
     /*****************************************************************
     Move the player left
     ******************************************************************/
-    @FXML protected void directionLeft() {
-        // Game.move("left");
-    }
+    @FXML protected void directionLeft() {}
 
     /*****************************************************************
     Move the player right
     ******************************************************************/
-    @FXML protected void directionRight() {
-        // Game.move("right");
-    }
+    @FXML protected void directionRight() {}
 
     /*****************************************************************
     Pick up an item
     ******************************************************************/
-    @FXML protected void pickup() {
-        this.setResults("pickup");
-    }
+    @FXML protected void pickup() {}
 
     /*****************************************************************
     Drop an item
     ******************************************************************/
-    @FXML protected void drop() {
-        this.setResults("drop");
-    }
+    @FXML protected void drop() {}
 
     /*****************************************************************
     Eat an item
     ******************************************************************/
-    @FXML protected void eat() {
-        this.setResults("eat");
-    }
+    @FXML protected void eat() {}
 
     /*****************************************************************
     Look around
     ******************************************************************/
-    @FXML protected void look() {
-        this.setResults("look around");
-    }
+    @FXML protected void look() {}
 
     /*****************************************************************
     Make a guess about the murder
     ******************************************************************/
-    @FXML protected void guess() {
-        this.setResults("guess");
-    }
+    @FXML protected void guess() {}
+
+    /*****************************************************************
+    Solve the murder
+    ******************************************************************/
+    @FXML protected void solve() {}
 
     /*****************************************************************
     Start a new game
     ******************************************************************/
-    @FXML protected void newGame() {
-        this.setResults("new game");
-    }
+    @FXML protected void newGame() {}
 
     /*****************************************************************
     Close the game
@@ -138,11 +128,15 @@ public class GameGUI {
     Display help
     ******************************************************************/
     @FXML protected void help() {
-        String results = "Move around the map using the direction keys. " +
-            "Pickup items you find and collect the clues. " +
-            "Once you have enough clues make a guess.";
+        try {
+            URI path = getClass().getResource("assets/help.md").toURI();
 
-        this.setResults(results);
+            String help = MarkdownParser.parse(path);
+
+            this.setResults(help, false);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /*****************************************************************
@@ -152,23 +146,41 @@ public class GameGUI {
         String results = "A Game modelled after the Board game of Clue." +
             System.lineSeparator() + "Written by: Ben Payne";
 
-        this.setResults(results);
+        this.setResults(results, false);
     }
 
     /*****************************************************************
     Set the results
+    @param results the results to set
     ******************************************************************/
-    public void setResults(final String results) {
-        this.results.appendText(
-            results + System.lineSeparator() + System.lineSeparator()
-        );
+    void setResults(final String results) {
+        String parsedResults = MarkdownParser.parse(results);
+
+        this.results.getEngine().loadContent(parsedResults);
+    }
+
+    /*****************************************************************
+    Set the results, optionally parsing markdown
+    @param results the results to parse or set
+    @param parse whether to parse the results first
+    ******************************************************************/
+    private void setResults(final String results, final boolean parse) {
+        String parsedResults;
+
+        if (parse) {
+            parsedResults = MarkdownParser.parse(results);
+        } else {
+            parsedResults = results;
+        }
+
+        this.results.getEngine().loadContent(parsedResults);
     }
 
     /*****************************************************************
     Get the buttons
     @return ArrayList the gui buttons
     ******************************************************************/
-    public ArrayList<Button> getMovementButtons() {
+    ArrayList<Button> getMovementButtons() {
         return new ArrayList<>(Arrays.asList(
             buttonUp,
             buttonDown,
@@ -180,8 +192,8 @@ public class GameGUI {
     /*****************************************************************
     Get the results textarea
     ******************************************************************/
-    public TextArea getResults() {
-        return this.results;
+    WebEngine getResults() {
+        return this.results.getEngine();
     }
 
     /*****************************************************************
@@ -192,23 +204,30 @@ public class GameGUI {
     }
 
     /*****************************************************************
-    Get the weaponLabel
+    Get the guess button
     ******************************************************************/
-    public Label getLabelWeapon() {
-        return this.labelWeapon;
+    public Button getButtonGuess() {
+        return buttonGuess;
     }
 
     /*****************************************************************
-    Get the weaponLabel
+    Get the suspect guess text field
     ******************************************************************/
-    public Label getLabelSuspect() {
-        return this.labelSuspect;
+    public Text getSuspectGuess() {
+        return suspectGuess;
     }
 
     /*****************************************************************
-    Get the weaponLabel
+    Get the location guess text field
     ******************************************************************/
-    public Label getLabelLocation() {
-        return this.labelLocation;
+    public Text getLocationGuess() {
+        return locationGuess;
+    }
+
+    /*****************************************************************
+    Get the item guess text field
+    ******************************************************************/
+    public Text getItemGuess() {
+        return itemGuess;
     }
 }
