@@ -153,7 +153,7 @@
 
     <Button fx:id="buttonGuess" mnemonicParsing="false" onAction="#guess"
             prefWidth="80.0" text="Guess" GridPane.columnIndex="5"
-            GridPane.halignment="CENTER" GridPane.rowIndex="13"
+            GridPane.halignment="CENTER" GridPane.rowIndex="13" disable="true"
     />
 
     <Button fx:id="buttonSolve" mnemonicParsing="false" onAction="#solve"

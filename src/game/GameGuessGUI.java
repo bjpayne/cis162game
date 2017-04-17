@@ -49,19 +49,22 @@ public class GameGuessGUI {
 
     /*****************************************************************
     Set the choice boxes
-    @param suspects the game suspects
+    @param objects the game objects
     @param choiceBox the choice box to set
     *****************************************************************/
     private void setChoiceBoxList(
-        List<? extends GameObjectInterface> suspects,
+        List<? extends GameObjectInterface> objects,
         ChoiceBox<String> choiceBox
     ) {
-        ObservableList<String> choiceBoxList = FXCollections.observableArrayList();
+        ObservableList<String> choiceBoxList =
+            FXCollections.observableArrayList();
 
-        choiceBoxList.add(0, "-- select one --");
+        int index = 0;
 
-        for (GameObjectInterface suspect : suspects) {
-            choiceBoxList.add((int) suspect.getId(), suspect.getName());
+        for (GameObjectInterface object : objects) {
+            choiceBoxList.add(index, object.getName());
+
+            index++;
         }
 
         choiceBox.setItems(choiceBoxList);

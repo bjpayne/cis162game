@@ -130,7 +130,7 @@ public class Item implements GameObjectInterface {
     Check whether the item is edible
     @return boolean whether the item is edible
     *****************************************************************/
-    public boolean getIsConsumable() {
+    public boolean isConsumable() {
         return this.isConsumable;
     }
 
@@ -138,7 +138,7 @@ public class Item implements GameObjectInterface {
     Set whether the item is consumable
     @param isConsumable whether the item is consumable
     *****************************************************************/
-    public void setIsConsumable(final boolean isConsumable) {
+    public void isConsumable(final boolean isConsumable) {
         this.isConsumable = isConsumable;
     }
 

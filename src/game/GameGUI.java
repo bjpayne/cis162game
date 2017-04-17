@@ -64,6 +64,7 @@ public class GameGUI {
 
     /** Item Text */
     @FXML private Text itemGuess;
+    private Object movementButtons;
 
     /*****************************************************************
     Set the game instance
@@ -104,26 +105,28 @@ public class GameGUI {
     Pick up an item
     ******************************************************************/
     @FXML protected void pickup() {
-
+        game.pickup();
     }
 
     /*****************************************************************
     Drop an item
     ******************************************************************/
-    @FXML protected void drop() {}
+    @FXML protected void drop() {
+        this.game.drop();
+    }
 
     /*****************************************************************
     Eat an item
     ******************************************************************/
     @FXML protected void eat() {
-
+        this.game.eat();
     }
 
     /*****************************************************************
     Look around
     ******************************************************************/
     @FXML protected void look() {
-        this.game.look();
+        this.game.look("");
     }
 
     /*****************************************************************
@@ -171,7 +174,7 @@ public class GameGUI {
     @FXML protected void about() {
         try {
             URI path = getClass()
-                .getResource("assets/welcome.md")
+                .getResource("assets/about.md")
                 .toURI();
 
             this.setResults(path);
@@ -260,5 +263,12 @@ public class GameGUI {
     ******************************************************************/
     public Text getItemGuess() {
         return itemGuess;
+    }
+
+    /*****************************************************************
+    Get the item guess text field
+    ******************************************************************/
+    public Button[] getMovementButtons() {
+        return new Button[] {buttonUp, buttonDown, buttonLeft, buttonRight};
     }
 }
