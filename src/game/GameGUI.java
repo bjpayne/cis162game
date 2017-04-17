@@ -7,9 +7,9 @@ import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /*****************************************************************
 Handle the events for the GUI.
@@ -17,6 +17,9 @@ Handle the events for the GUI.
 @version 4/4/2017.
 ******************************************************************/
 public class GameGUI {
+    /** The game instance */
+    private Game game;
+
     /** Direction Up Button */
     @FXML private Button buttonUp;
 
@@ -63,29 +66,46 @@ public class GameGUI {
     @FXML private Text itemGuess;
 
     /*****************************************************************
+    Set the game instance
+    *****************************************************************/
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    /*****************************************************************
     Move the player up
     *****************************************************************/
-    @FXML protected void directionUp() {}
+    @FXML protected void directionUp() {
+        this.game.move(this.buttonUp.getText());
+    }
 
     /*****************************************************************
     Move the player down
     ******************************************************************/
-    @FXML protected void directionDown() {}
+    @FXML protected void directionDown() {
+        this.game.move(this.buttonDown.getText());
+    }
 
     /*****************************************************************
     Move the player left
     ******************************************************************/
-    @FXML protected void directionLeft() {}
+    @FXML protected void directionLeft() {
+        this.game.move(this.buttonLeft.getText());
+    }
 
     /*****************************************************************
     Move the player right
     ******************************************************************/
-    @FXML protected void directionRight() {}
+    @FXML protected void directionRight() {
+        this.game.move(this.buttonRight.getText());
+    }
 
     /*****************************************************************
     Pick up an item
     ******************************************************************/
-    @FXML protected void pickup() {}
+    @FXML protected void pickup() {
+
+    }
 
     /*****************************************************************
     Drop an item
@@ -95,17 +115,23 @@ public class GameGUI {
     /*****************************************************************
     Eat an item
     ******************************************************************/
-    @FXML protected void eat() {}
+    @FXML protected void eat() {
+
+    }
 
     /*****************************************************************
     Look around
     ******************************************************************/
-    @FXML protected void look() {}
+    @FXML protected void look() {
+        this.game.look();
+    }
 
     /*****************************************************************
     Make a guess about the murder
     ******************************************************************/
-    @FXML protected void guess() {}
+    @FXML protected void guess() {
+        game.guess();
+    }
 
     /*****************************************************************
     Solve the murder
@@ -115,7 +141,9 @@ public class GameGUI {
     /*****************************************************************
     Start a new game
     ******************************************************************/
-    @FXML protected void newGame() {}
+    @FXML protected void newGame() {
+        this.game.createGameWorld();
+    }
 
     /*****************************************************************
     Close the game
@@ -131,11 +159,9 @@ public class GameGUI {
         try {
             URI path = getClass().getResource("assets/help.md").toURI();
 
-            String help = MarkdownParser.parse(path);
-
-            this.setResults(help, false);
+            this.setResults(path);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -143,10 +169,15 @@ public class GameGUI {
     About the game
     ******************************************************************/
     @FXML protected void about() {
-        String results = "A Game modelled after the Board game of Clue." +
-            System.lineSeparator() + "Written by: Ben Payne";
+        try {
+            URI path = getClass()
+                .getResource("assets/welcome.md")
+                .toURI();
 
-        this.setResults(results, false);
+            this.setResults(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*****************************************************************
@@ -161,32 +192,32 @@ public class GameGUI {
 
     /*****************************************************************
     Set the results, optionally parsing markdown
-    @param results the results to parse or set
-    @param parse whether to parse the results first
+    @param path the path to parse
     ******************************************************************/
-    private void setResults(final String results, final boolean parse) {
-        String parsedResults;
+    void setResults(final URI path) {
+        String results = MarkdownParser.parse(path);
 
-        if (parse) {
-            parsedResults = MarkdownParser.parse(results);
-        } else {
-            parsedResults = results;
-        }
-
-        this.results.getEngine().loadContent(parsedResults);
+        this.results.getEngine().loadContent(results);
     }
 
     /*****************************************************************
     Get the buttons
     @return ArrayList the gui buttons
     ******************************************************************/
-    ArrayList<Button> getMovementButtons() {
-        return new ArrayList<>(Arrays.asList(
-            buttonUp,
-            buttonDown,
-            buttonLeft,
-            buttonRight
-        ));
+    ArrayList<Button> getButtons() {
+        ArrayList<Button> buttons = new ArrayList<>();
+
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (Button.class.isAssignableFrom(field.getType())) {
+                    buttons.add((Button) field.get(this));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return buttons;
     }
 
     /*****************************************************************

@@ -16,9 +16,7 @@ import javafx.stage.Stage;
 
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /*****************************************************************
 A simple game of clue
@@ -30,10 +28,7 @@ public class Game extends Application {
     /** The gameGUI controller */
     private GameGUI gameGUIController;
 
-    /** The gameGUIGuess controller */
-    private GameGuessGUI gameGuessGUIController;
-
-    /** The current player  */
+    /** The current location */
     private Location currentLocation;
 
     /** The Location Dao */
@@ -49,7 +44,7 @@ public class Game extends Application {
     private Dao<Suspect, Integer> suspectDao;
 
     /** The Correct Game Objects to solve the mystery */
-    private ArrayList<GameObjectInterface> validGameObjects;
+    private ArrayList<GameObjectInterface> solution;
 
     /** The game suspects */
     private List<Suspect> suspects;
@@ -82,6 +77,8 @@ public class Game extends Application {
             // Get the controller instance
             this.gameGUIController = loader.getController();
 
+            this.gameGUIController.setGame(this);
+
             // Set the styles for the view
             this.gameGUIController.getResults().setUserStyleSheetLocation(
                 getClass()
@@ -99,7 +96,7 @@ public class Game extends Application {
             primaryStage.setScene(new Scene(root, 800, 500));
             primaryStage.show();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -114,89 +111,81 @@ public class Game extends Application {
     /*****************************************************************
     Create the game
     *****************************************************************/
-    private void createGameWorld() {
+    void createGameWorld() {
         try {
-            this.handleMoveButtonEvent();
-
-            this.handleGuessButtonEvent();
-
-            this.setWelcomeMessage();
-
-            // Get a random  based on the  table size
-            this.setLocation(
-                (new Random()).nextInt(locationDao.queryForAll().size()) + 1
-            );
-
             // Cache the game objects
-            this.suspects = this.suspectDao.queryForAll();
-
+            this.suspects  = this.suspectDao.queryForAll();
             this.locations = this.locationDao.queryForAll();
-
-            this.items = this.itemDao.queryForAll();
+            this.items     = this.itemDao.queryForAll();
 
             // Get a random random game objects to solve the mystery
-            this.setValidGameObjects();
+            this.setSolution();
+
+            // Get a random location based on the table size
+            this.setLocation((new Random()).nextInt(this.locations.size()));
+
+            // Set the random objects throughout the map
+            setLocationsItems();
+
+            // Set the locations neighbors
+            setLocationsNeighbors();
+
+            // Set the game welcome message
+            this.setWelcomeMessage();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    /*****************************************************************
-    Set the movement button action event listener
-    *****************************************************************/
-    private void handleMoveButtonEvent() {
-        for (Button button : this.gameGUIController.getMovementButtons()) {
-            button.setOnAction(event -> move(button.getText()));
-        }
-    }
 
     /*****************************************************************
     Set the guess button handler
     *****************************************************************/
-    private void handleGuessButtonEvent() {
-        this.gameGUIController.getButtonGuess().setOnAction(event -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("view/gameGuessGui.fxml")
+    void guess() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("view/gameGuessGui.fxml")
+            );
+
+            AnchorPane page = loader.load();
+
+            // Create the dialog Stage.
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit Person");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(this.primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Get the controller
+            GameGuessGUI gameGuessGUIController = loader.getController();
+
+            gameGuessGUIController.setDialogStage(dialogStage);
+
+            gameGuessGUIController.setChoiceBoxes(
+                this.suspects,
+                this.locations,
+                this.items
+            );
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+            if (gameGuessGUIController.userClickedGuess()) {
+                handleGuess(
+                    gameGuessGUIController.getSuspectChoiceBox(),
+                    gameGuessGUIController.getLocationChoiceBox(),
+                    gameGuessGUIController.getItemChoiceBox()
                 );
-
-                AnchorPane page = loader.load();
-
-                // Create the dialog Stage.
-                Stage dialogStage = new Stage();
-                dialogStage.setTitle("Edit Person");
-                dialogStage.initModality(Modality.WINDOW_MODAL);
-                dialogStage.initOwner(this.primaryStage);
-                Scene scene = new Scene(page);
-                dialogStage.setScene(scene);
-
-                // Get the controller
-                this.gameGuessGUIController = loader.getController();
-
-                this.gameGuessGUIController.setDialogStage(dialogStage);
-
-                this.gameGuessGUIController.setChoiceBoxes(
-                    this.suspects,
-                    this.locations,
-                    this.items
-                );
-
-                // Show the dialog and wait until the user closes it
-                dialogStage.showAndWait();
-
-                if (gameGuessGUIController.userClickedGuess()) {
-                    handleGuess(
-                        this.gameGuessGUIController.getSuspectChoiceBox(),
-                        this.gameGuessGUIController.getLocationChoiceBox(),
-                        this.gameGuessGUIController.getItemChoiceBox()
-                    );
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /*****************************************************************
+    Handle the users Guess
+    *****************************************************************/
     private void handleGuess(
         final ChoiceBox<String> suspectChoiceBox,
         final ChoiceBox<String> locationChoiceBox,
@@ -217,39 +206,48 @@ public class Game extends Application {
 
             int matches = 0;
 
-            for (GameObjectInterface validGameObject : this.validGameObjects) {
-                if (validGameObject.belongsTo(suspectChoiceBox) &&
-                    validGameObject.getId() == suspect_id
+            for (GameObjectInterface gameObject : this.solution) {
+                if (gameObject.belongsTo(suspectChoiceBox) &&
+                    gameObject.getId() == suspect_id
                 ) {
                     this.gameGUIController.getSuspectGuess().setText(
-                        validGameObject.getName()
+                        gameObject.getName()
                     );
 
                     matches++;
                 }
 
-                if (validGameObject.belongsTo(locationChoiceBox) &&
-                    validGameObject.getId() == location_id
+                if (gameObject.belongsTo(locationChoiceBox) &&
+                    gameObject.getId() == location_id
                 ) {
                     this.gameGUIController.getLocationGuess().setText(
-                        validGameObject.getName()
+                        gameObject.getName()
                     );
 
                     matches++;
                 }
 
-                if (validGameObject.belongsTo(itemChoiceBox) &&
-                    validGameObject.getId() == item_id
+                if (gameObject.belongsTo(itemChoiceBox) &&
+                    gameObject.getId() == item_id
                 ) {
                     this.gameGUIController.getItemGuess().setText(
-                        validGameObject.getName()
+                        gameObject.getName()
                     );
 
                     matches++;
                 }
             }
 
-            gameGUIController.setResults("You got " + matches + " / 3 correct");
+            if (matches == 3) {
+                gameGUIController.setResults("You won!");
+
+                this.endGame();
+            } else {
+                gameGUIController.setResults(
+                    "Close. Keep playing to gather more clues"
+                );
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -260,37 +258,72 @@ public class Game extends Application {
     current location
     @param direction the movement direction
     *****************************************************************/
-    private void move(final String direction) {
+    void move(final String direction) {
         try {
-            QueryBuilder<LocationNeighbors, Integer> query =
-                locationNeighborsDao.queryBuilder();
+            Location newLocation =
+                this.currentLocation.getNeighbors().get(direction);
 
-            query.where()
-                .eq(LocationNeighbors.LOCATION_ID, this.currentLocation.getId())
-                .and()
-                .eq(LocationNeighbors.DIRECTION, direction.toLowerCase());
-
-            List<LocationNeighbors> locationNeighbors;
-
-            locationNeighbors = locationNeighborsDao.query(query.prepare());
-
-            if (locationNeighbors.size() == 0) {
+            if (newLocation == null) {
                 this.gameGUIController
-                    .setResults("You cannot move **" + direction + "**");
+                    .setResults("You cannot move " + direction);
 
                 return;
             }
 
-            LocationNeighbors neighbor = locationNeighbors.get(0);
+            this.currentLocation = newLocation;
 
-            Location newLocation = locationDao.
-                queryForId(neighbor.getNeighborId());
+            if (! this.currentLocation.isSolvable()) {
+                gameGUIController.getButtonGuess().setDisable(true);
+            } else {
+                gameGUIController.getButtonGuess().setDisable(false);
+            }
 
-            this.setLocation(newLocation);
-
-            this.gameGUIController.setResults(newLocation.getDescription());
+            this.look();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /*****************************************************************
+    Look around and describe the current game world
+    *****************************************************************/
+    void look() {
+        String lookResult = "You are ";
+        lookResult += this.currentLocation.getDescription().toLowerCase();
+        lookResult += ".<br>";
+
+        for (Map.Entry<String, Location> entry :
+            this.currentLocation.getNeighbors().entrySet()
+        ) {
+            String neighborDescription = this.currentLocation
+                .getNeighborDescription(entry.getValue());
+
+            lookResult += neighborDescription;
+            lookResult += " is the ";
+            lookResult += entry.getValue().getName();
+            lookResult += ".<br>";
+        }
+
+        lookResult += "In the room there is a ";
+
+        if (currentLocation.isSolvable()) {
+            lookResult += currentLocation
+                .getItem()
+                .getDescription()
+                .toLowerCase();
+        }
+
+        this.gameGUIController.setResults(lookResult);
+    }
+
+    /*****************************************************************
+    End the game
+    *****************************************************************/
+    private void endGame() {
+        List<Button> buttons = this.gameGUIController.getButtons();
+
+        for (Button button : buttons) {
+            button.setDisable(true);
         }
     }
 
@@ -301,73 +334,113 @@ public class Game extends Application {
         try {
             URI file = getClass().getResource("assets/welcome.md").toURI();
 
-            String welcome = MarkdownParser.parse(file);
-
-            this.gameGUIController.setResults(welcome);
+            this.gameGUIController.setResults(file);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     /*****************************************************************
     Query for a  then set the current
-    @param locationId the current locations ID
+    @param index the current locations ID
     *****************************************************************/
-    private void setLocation(final int locationId) {
+    private void setLocation(final int index) {
         try {
-            this.currentLocation = locationDao.queryForId(locationId);
+            this.currentLocation = this.locations.get(index);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     /*****************************************************************
-    Set the current
-    @param location the current locations ID
+    Set the game world locations neighbors
     *****************************************************************/
-    private void setLocation(Location location) {
+    private void setLocationsNeighbors() {
+        // Loop through all the locations
+        this.locations.forEach((Location location) -> {
+            try {
+                // Initialize the neighbors Map
+                location.initNeighbors();
+
+                // Get all the neighbors for the current iteration
+                QueryBuilder<LocationNeighbors, Integer> query =
+                    locationNeighborsDao.queryBuilder();
+
+                query.where()
+                    .eq(LocationNeighbors.LOCATION_ID, location.getId());
+
+                List<LocationNeighbors> neighbors =
+                    locationNeighborsDao.query(query.prepare());
+
+                // Loop through all the neighbors for the current iteration
+                neighbors.forEach((LocationNeighbors neighbor) -> {
+                    try {
+                        // Add each neighbor using the direction as the key
+                        location.addNeighbor(
+                            neighbor.getDirection(),
+                            this.locationDao.queryForId(
+                                neighbor.getNeighborId()
+                            ),
+                            neighbor.getDescription()
+                        );
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /*****************************************************************
+    Set the game world locations items
+    *****************************************************************/
+    private void setLocationsItems() {
         try {
-            this.currentLocation = location;
+            List<Location> solvableLocations = new ArrayList<>();
+
+            List<Item> solvableItems = new ArrayList<>();
+
+            this.locations.forEach((Location location) -> {
+                if (location.isSolvable()) {
+                    solvableLocations.add(location);
+                }
+            });
+
+            this.items.forEach((Item item) -> {
+                if (item.isSolvable()) {
+                    solvableItems.add(item);
+                }
+            });
+
+            // Shuffle the items so they are random
+            Collections.shuffle(solvableItems, new Random(System.nanoTime()));
+
+            int index = 0;
+
+            for (Location location : solvableLocations) {
+                location.addItem(solvableItems.get(index));
+
+                index++;
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     /*****************************************************************
     Set the correct game objects to solve the mystery
     *****************************************************************/
-    private void setValidGameObjects() {
+    private void setSolution() {
         try {
-            // Get the suspect and  ids
-            final int suspect_id =
-                (new Random()).nextInt(suspectDao.queryForAll().size()) + 1;
+            solution = new ArrayList<>();
 
-            final int location_id =
-                (new Random()).nextInt(locationDao.queryForAll().size()) + 1;
-
-            // Get all the items that can solve the mystery
-            QueryBuilder<Item, Integer> query = itemDao.queryBuilder();
-
-            query.where().eq(Item.SOLVABLE, true);
-
-            List<Item> items = itemDao.query(query.prepare());
-
-            final int item_id = (new Random()).nextInt(items.size()) + 1;
-
-            // Get the objects
-            Suspect suspect = suspectDao.queryForId(suspect_id);
-
-            Location location = locationDao.queryForId(location_id);
-
-            Item item = itemDao.queryForId(item_id);
-
-            validGameObjects = new ArrayList<>();
-
-            validGameObjects.add(suspect);
-            validGameObjects.add(location);
-            validGameObjects.add(item);
+            solution.add(Suspect.getSolvableObject(suspectDao));
+            solution.add(Location.getSolvableObject(locationDao));
+            solution.add(Item.getSolvableObject(itemDao));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -401,7 +474,7 @@ public class Game extends Application {
 
             suspectDao = DaoManager.createDao(getDbSource(), Suspect.class);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

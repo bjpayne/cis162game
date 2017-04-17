@@ -28,7 +28,7 @@ class MarkdownParser {
 
             return render(content);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         return "";
@@ -58,7 +58,7 @@ class MarkdownParser {
 
             return renderer.render(document);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         return "";

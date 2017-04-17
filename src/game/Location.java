@@ -1,10 +1,14 @@
 package game;
 
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 import javafx.scene.control.ChoiceBox;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 /*****************************************************************
 Model the  table.
@@ -17,19 +21,28 @@ public class Location implements GameObjectInterface {
     @DatabaseField(id = true)
     private long id;
 
-    /** The  description */
+    /** The description */
     @DatabaseField()
     private String description;
 
-    /** The  name */
+    /** The name */
     @DatabaseField()
     private String name;
+
+    /** Is the location solvable */
+    @DatabaseField()
+    private boolean solvable;
 
     /** The locations item */
     private Item item = null;
 
     /** The locations neighbors */
     private HashMap<String, Location> neighbors;
+
+    private HashMap<Location, String> neighborDescription;
+
+    /** Query builder accessors */
+    private static final String SOLVABLE = "solvable";
 
     /*****************************************************************
     Model Constructor
@@ -38,21 +51,27 @@ public class Location implements GameObjectInterface {
 
     /*****************************************************************
     Initialize a new Item
-    @param description The  description.
+    @param dao The items description.
+    @return GameObjectInterface
     *****************************************************************/
-    public Location(final String description) {
-        this.description = description;
-    }
+    static GameObjectInterface getSolvableObject(
+        final Dao<Location, Integer> dao
+    ) {
+        try {
+            QueryBuilder<Location, Integer> query = dao.queryBuilder();
 
-    /*****************************************************************
-    Initialize a new Item
-    @param description The items description.
-    @param item The locations items
-    *****************************************************************/
-    public Location(final String description, final Item item) {
-        this.description = description;
+            query.where().eq(Location.SOLVABLE, true);
 
-        this.item = item;
+            List<Location> locations = dao.query(query.prepare());
+
+            final int index = (new Random()).nextInt(locations.size());
+
+            return locations.get(index);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /*****************************************************************
@@ -64,18 +83,10 @@ public class Location implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Set the locations id
-    @param id the locations id
-    *****************************************************************/
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    /*****************************************************************
     Get the locations description
     @return String the locations description
     *****************************************************************/
-    public String getDescription() {
+    String getDescription() {
         return description;
     }
 
@@ -83,7 +94,7 @@ public class Location implements GameObjectInterface {
     Get the locations item
     @return Item the locations item
     *****************************************************************/
-    public Item getItem() {
+    Item getItem() {
         return item;
     }
 
@@ -91,24 +102,48 @@ public class Location implements GameObjectInterface {
     Add an item to the location
     @param item the item to add to the location
     *****************************************************************/
-    public void addItem (Item item) {
+    void addItem(Item item) {
         this.item = item;
     }
 
     /*****************************************************************
-    Check if the Location has an item
-    @return boolean whether the  has an item
+    Initialize the neighbors property
     *****************************************************************/
-    public boolean hasItem() {
-        return this.getItem() == null;
+    void initNeighbors() {
+        this.neighbors = new HashMap<>();
+
+        this.neighborDescription = new HashMap<>();
     }
 
     /*****************************************************************
     Get the locations neighbors
     @return HashMap the locations neighbors
     *****************************************************************/
-    public HashMap<String, Location> getNeighbors() {
-        return neighbors;
+    HashMap<String, Location> getNeighbors() {
+        return this.neighbors;
+    }
+
+    /*****************************************************************
+    Get the neighbors description
+    @return HashMap the locations neighbors
+    *****************************************************************/
+    String getNeighborDescription(Location neighbor) {
+        return this.neighborDescription.get(neighbor);
+    }
+
+    /*****************************************************************
+    Get the locations neighbors
+    @param direction the neighbors direction
+    @param location the neighbor instance
+    *****************************************************************/
+    void addNeighbor(
+        final String direction,
+        final Location location,
+        final String description
+    ) {
+        this.neighbors.put(direction, location);
+
+        this.neighborDescription.put(location, description);
     }
 
     /*****************************************************************
@@ -119,16 +154,21 @@ public class Location implements GameObjectInterface {
         return name;
     }
 
+    /*****************************************************************
+    Get the choice box this belongs to
+    @param choice the location choice box
+    @return boolean
+    *****************************************************************/
     @Override
     public boolean belongsTo(ChoiceBox<String> choice) {
         return choice.getId().equals("locationChoiceBox");
     }
 
     /*****************************************************************
-    Set the locations name
-    @param String the locations name
+    Get whether the location can solve the mystery
+    @return boolean is the location solvable
     *****************************************************************/
-    public void setName(String name) {
-        this.name = name;
+    boolean isSolvable() {
+        return solvable;
     }
 }

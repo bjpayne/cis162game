@@ -8,11 +8,11 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-/**
- * Dialog to edit details of a person.
- *
- * @author Marco Jakob
- */
+/*****************************************************************
+Handle the events for the Guess Modal.
+@author Ben Payne
+@version 4/4/2017.
+*****************************************************************/
 public class GameGuessGUI {
     /** The suspect choice box */
     @FXML private ChoiceBox<String> suspectChoiceBox;

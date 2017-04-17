@@ -1,8 +1,13 @@
 package game;
 
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 import javafx.scene.control.ChoiceBox;
+
+import java.util.List;
+import java.util.Random;
 
 /*****************************************************************
 The Item class.
@@ -41,6 +46,7 @@ public class Item implements GameObjectInterface {
 
     /** Query builder accessors */
     static final String SOLVABLE = "solvable";
+    static final String NAME = "name";
 
     /*****************************************************************
     Model Constructor
@@ -74,6 +80,26 @@ public class Item implements GameObjectInterface {
     @Override
     public boolean belongsTo(ChoiceBox<String> choice) {
         return choice.getId().equals("itemChoiceBox");
+    }
+
+    public static GameObjectInterface getSolvableObject(
+        final Dao<Item, Integer> dao
+    ) {
+        try {
+            QueryBuilder<Item, Integer> query = dao.queryBuilder();
+
+            query.where().eq(Item.SOLVABLE, true);
+
+            List<Item> locations = dao.query(query.prepare());
+
+            final int index = (new Random()).nextInt(locations.size());
+
+            return locations.get(index);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /*****************************************************************
@@ -152,7 +178,7 @@ public class Item implements GameObjectInterface {
     Get whether the item can solve the mystery
     @return boolean whether the item solved the mystery
     *****************************************************************/
-    public boolean getSolvable() {
+    public boolean isSolvable() {
         return solvable;
     }
 

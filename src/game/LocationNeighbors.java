@@ -32,7 +32,7 @@ public class LocationNeighbors {
 
     /** Query builder accessors */
     static final String LOCATION_ID = "location_id";
-    static final String DIRECTION = "direction";
+    static final String NEIGHBOR_ID = "neighbor_id";
 
     /*****************************************************************
     Model Constructor

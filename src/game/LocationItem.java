@@ -3,6 +3,9 @@ package game;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.HashMap;
+import java.util.List;
+
 /*****************************************************************
 Model the location_item lookup table
 @author Ben Payne
@@ -14,13 +17,22 @@ public class LocationItem {
     @DatabaseField(id = true)
     private int id;
 
-    /** The  id */
+    /** The model location id */
     @DatabaseField()
     private int location_id;
 
-    /** The item id */
+    /** The model item id */
     @DatabaseField()
     private int item_id;
+
+    /** All solvable locations */
+    private List<Location> locations;
+
+    /** All solvable items */
+    private List<Item> items;
+
+    /** The random location items */
+    private HashMap<Location, Item> locationsItems;
 
     /** Query builder accessors */
     static final String LOCATION_ID = "location_id";
@@ -29,5 +41,5 @@ public class LocationItem {
     /*****************************************************************
     Model Constructor
     *****************************************************************/
-    public LocationItem() {}
+    LocationItem() {}
 }
