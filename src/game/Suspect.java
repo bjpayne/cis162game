@@ -6,6 +6,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -56,21 +57,6 @@ public class Suspect implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Set the suspect primary key
-    @param id the suspect id
-    *****************************************************************/
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /*****************************************************************
-    @param name The suspects name
-    *****************************************************************/
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /*****************************************************************
     get the suspects name
     @return string the characters name
     *****************************************************************/
@@ -94,5 +80,19 @@ public class Suspect implements GameObjectInterface {
     @Override
     public boolean equals(Object object) {
         return this.getClass() == object.getClass();
+    }
+
+    /*****************************************************************
+    Check if the guess is correct
+    @return boolean whether its correct
+    *****************************************************************/
+    @Override
+    public boolean guess(
+        final Map.Entry<String, String> guess,
+        final String solution
+    ) {
+        return guess.getKey().equals("suspect") &&
+               guess.getValue().equals(solution);
+
     }
 }

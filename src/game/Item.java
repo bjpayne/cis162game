@@ -5,8 +5,10 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.text.Text;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -78,21 +80,21 @@ public class Item implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Get the items name
-    @return String The items name
+    Check if the guess is correct
+    @return boolean whether its correct
     *****************************************************************/
     @Override
-    public boolean belongsTo(ChoiceBox<String> choice) {
-        return choice.getId().equals("itemChoiceBox");
-    }
+    public boolean guess(
+        final Map.Entry<String, String> guess,
+        final String solution
+    ) {
+        return guess.getKey().equals("item") &&
+               guess.getValue().equals(solution);
 
-    @Override
-    public boolean equals() {
-        return false;
     }
 
     /*****************************************************************
-    Get the items name
+    Get the solvable object for this type
     @return String The items name
     *****************************************************************/
     static GameObjectInterface getSolvableObject(

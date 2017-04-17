@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
+<?import javafx.scene.text.Text?>
 <AnchorPane prefHeight="154.0" prefWidth="413.0"
             xmlns="http://javafx.com/javafx/8.0.111"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -46,12 +47,12 @@
                    GridPane.columnIndex="1"
         />
 
-        <ChoiceBox fx:id="locationChoiceBox" prefWidth="290.0"
-                   GridPane.columnIndex="1" GridPane.rowIndex="1"
+        <Text fx:id="locationChoice" strokeType="OUTSIDE" strokeWidth="0.0"
+              text="--" GridPane.columnIndex="1" GridPane.rowIndex="1"
         />
 
-        <ChoiceBox fx:id="itemChoiceBox" prefWidth="290.0" GridPane.columnIndex="1"
-                   GridPane.rowIndex="2"
+        <Text fx:id="itemChoice" strokeType="OUTSIDE" strokeWidth="0.0"
+              text="--" GridPane.columnIndex="1" GridPane.rowIndex="2"
         />
     </GridPane>
 

@@ -47,7 +47,7 @@ public class Game extends Application {
     private Dao<Suspect, Integer> suspectDao;
 
     /** The Correct Game Objects to solve the mystery */
-    private Map<GameObjectInterface, String> solution;
+    private List<GameObjectInterface> solution;
 
     /** The game suspects */
     private List<Suspect> suspects;
@@ -193,44 +193,42 @@ public class Game extends Application {
     *****************************************************************/
     private void handleGuess(final ChoiceBox<String> suspectChoiceBox) {
         try {
-            final String suspect_name = suspectChoiceBox
+            final String suspectName = suspectChoiceBox
                 .getSelectionModel()
                 .getSelectedItem();
 
+            final String locationName = this.currentLocation.getName();
+
+            final String itemName = this.currentItem.getName();
+
+            HashMap<String, String> guesses = new HashMap<>();
+
+            guesses.put("suspect", suspectName);
+            guesses.put("location", suspectName);
+            guesses.put("item", suspectName);
+
             int matches = 0;
 
-            if (this.solution.containsKey(Suspect.class)) {
-                String correctSuspect = this.solution.get(Suspect.class);
+            for (GameObjectInterface gameObject : this.solution) {
+                final String gameObjectName = gameObject.getName();
 
-                if(correctSuspect.equals(suspect_name)) {
-                    this.gameGUIController
-                        .getSuspectGuess()
-                        .setText(correctSuspect);
+                for (Map.Entry<String, String> guess : guesses.entrySet()) {
+                    if(gameObject.guess(guess, gameObjectName)) {
+                        matches++;
 
-                    matches++;
+                        break;
+                    }
                 }
-            }
-
-            if (this.solution.containsKey(Suspect.class)) {
-                String correctLocation = this.solution.get(Suspect.class);
-
-                if(correctLocation.equals(this.currentItem.getName())) {
-                    matches++;
-                }
-            }
-
-            if (this.solution.containsKey(Suspect.class)) {
-                String corecctSuspect = this.solution.get(Suspect.class);
             }
 
             if (matches == 3) {
                 gameGUIController.setResults(
                     "<p>You have all three clues!</p>" +
-                    "<p>Click 'Solve' to end the game</p>"
+                    "<p>Click 'Solve' to end the game at any time.</p>"
                 );
             } else {
                 gameGUIController.setResults(
-                    "Close. Keep playing to gather more clues"
+                    "So close. Keep playing to gather more clues."
                 );
             }
         } catch (Exception e) {
@@ -544,7 +542,7 @@ public class Game extends Application {
     *****************************************************************/
     private void setSolution() {
         try {
-            this.solution = new HashMap<>();
+            this.solution = new ArrayList<>();
 
             GameObjectInterface suspect =
                     Suspect.getSolvableObject(this.suspectDao);
@@ -559,9 +557,9 @@ public class Game extends Application {
                 throw new Exception("Could not find valid game object");
             }
 
-            this.solution.put(suspect, suspect.getName());
-            this.solution.put(location, location.getName());
-            this.solution.put(item, item.getName());
+            this.solution.add(suspect);
+            this.solution.add(location);
+            this.solution.add(item);
         } catch (Exception e) {
             e.printStackTrace();
         }

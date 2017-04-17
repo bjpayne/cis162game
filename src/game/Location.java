@@ -5,9 +5,11 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.text.Text;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -155,18 +157,17 @@ public class Location implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Get the choice box this belongs to
-    @param choice the location choice box
-    @return boolean
+    Check if the guess is correct
+    @return boolean whether its correct
     *****************************************************************/
     @Override
-    public boolean belongsTo(ChoiceBox<String> choice) {
-        return choice.getId().equals("locationChoiceBox");
-    }
+    public boolean guess(
+        final Map.Entry<String, String> guess,
+        final String solution
+    ) {
+        return guess.getKey().equals("location") &&
+               guess.getValue().equals(solution);
 
-    @Override
-    public boolean equals() {
-        return false;
     }
 
     /*****************************************************************
