@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -18,10 +19,10 @@ public class GameGuessGUI {
     @FXML private ChoiceBox<String> suspectChoiceBox;
 
     /** The location choice box */
-    @FXML private ChoiceBox<String> locationChoiceBox;
+    @FXML private Text locationChoice;
 
     /** The item choice box */
-    @FXML private ChoiceBox<String> itemChoiceBox;
+    @FXML private Text itemChoice;
 
     /** The Window stage */
     private Stage dialogStage;
@@ -30,44 +31,38 @@ public class GameGuessGUI {
     private boolean userClickedGuess = false;
 
     /*****************************************************************
-    Initialize the ChoiceBoxes
-    @param suspects the game suspects
-    @param locations the game locations
-    @param items the game items
-    *****************************************************************/
-    void setChoiceBoxes(
-        final List<? extends GameObjectInterface> suspects,
-        final List<? extends GameObjectInterface> locations,
-        final List<? extends GameObjectInterface> items
-    ) {
-        setChoiceBoxList(suspects, this.suspectChoiceBox);
-
-        setChoiceBoxList(locations, this.locationChoiceBox);
-
-        setChoiceBoxList(items, this.itemChoiceBox);
-    }
-
-    /*****************************************************************
     Set the choice boxes
-    @param objects the game objects
-    @param choiceBox the choice box to set
+    @param suspects the game suspects
     *****************************************************************/
-    private void setChoiceBoxList(
-        List<? extends GameObjectInterface> objects,
-        ChoiceBox<String> choiceBox
-    ) {
+    void setSuspectChoiceBox(List<Suspect> suspects) {
         ObservableList<String> choiceBoxList =
             FXCollections.observableArrayList();
 
         int index = 0;
 
-        for (GameObjectInterface object : objects) {
+        for (GameObjectInterface object : suspects) {
             choiceBoxList.add(index, object.getName());
 
             index++;
         }
 
-        choiceBox.setItems(choiceBoxList);
+        this.suspectChoiceBox.setItems(choiceBoxList);
+    }
+
+    /*****************************************************************
+    Set the choice boxes
+    @param locationName the current location
+    *****************************************************************/
+    void setLocationChoice(String locationName) {
+        this.locationChoice.setText(locationName);
+    }
+
+    /*****************************************************************
+    Set the choice boxes
+    @param itemName the currently held item name
+    *****************************************************************/
+    void setItemChoice(String itemName) {
+        this.itemChoice.setText(itemName);
     }
 
     /*****************************************************************
@@ -100,31 +95,15 @@ public class GameGuessGUI {
     Get the suspect choice box
     @return ChoiceBox
     *****************************************************************/
-    public ChoiceBox<String> getSuspectChoiceBox() {
+    ChoiceBox<String> getSuspectChoiceBox() {
         return suspectChoiceBox;
-    }
-
-    /*****************************************************************
-    Get the location choice box
-    @return ChoiceBox
-    *****************************************************************/
-    public ChoiceBox<String> getLocationChoiceBox() {
-        return locationChoiceBox;
-    }
-
-    /*****************************************************************
-    Get the item choice box
-    @return ChoiceBox
-    *****************************************************************/
-    public ChoiceBox<String> getItemChoiceBox() {
-        return itemChoiceBox;
     }
 
     /*****************************************************************
     Get whether the user guessed or not
     @return boolean
     *****************************************************************/
-    public boolean userClickedGuess() {
+    boolean userClickedGuess() {
         return this.userClickedGuess;
     }
 }

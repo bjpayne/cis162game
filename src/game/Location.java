@@ -164,6 +164,11 @@ public class Location implements GameObjectInterface {
         return choice.getId().equals("locationChoiceBox");
     }
 
+    @Override
+    public boolean equals() {
+        return false;
+    }
+
     /*****************************************************************
     Get whether the location can solve the mystery
     @return boolean is the location solvable

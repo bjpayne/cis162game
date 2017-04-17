@@ -4,7 +4,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.control.ChoiceBox;
 
 import java.util.List;
 import java.util.Random;
@@ -80,11 +79,20 @@ public class Suspect implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Check if the selected Suspect is correct
+    Use as a key
     @return boolean whether its correct
     *****************************************************************/
     @Override
-    public boolean belongsTo(ChoiceBox<String> choice) {
-        return choice.getId().equals("suspectChoiceBox");
+    public int hashCode() {
+        return (int) this.getId();
+    }
+
+    /*****************************************************************
+    Use as a key
+    @return boolean whether its correct
+    *****************************************************************/
+    @Override
+    public boolean equals(Object object) {
+        return this.getClass() == object.getClass();
     }
 }

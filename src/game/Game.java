@@ -47,7 +47,7 @@ public class Game extends Application {
     private Dao<Suspect, Integer> suspectDao;
 
     /** The Correct Game Objects to solve the mystery */
-    private ArrayList<GameObjectInterface> solution;
+    private Map<GameObjectInterface, String> solution;
 
     /** The game suspects */
     private List<Suspect> suspects;
@@ -95,7 +95,7 @@ public class Game extends Application {
             // Create the game world
             createGameWorld();
 
-            primaryStage.setTitle("Game");
+            primaryStage.setTitle("You have no clue!");
             primaryStage.setScene(new Scene(root, 800, 500));
             primaryStage.show();
         } catch (Exception e) {
@@ -170,31 +170,18 @@ public class Game extends Application {
 
             gameGuessGUIController.setDialogStage(dialogStage);
 
-            // Get a single item for the list
-            List<Item> currentItemList = new ArrayList<>();
-
-            currentItemList.add(this.currentItem);
-
-            // Get a Location item for the list
-            List<Location> currentLocationList = new ArrayList<>();
-
-            currentLocationList.add(this.currentLocation);
-
-            gameGuessGUIController.setChoiceBoxes(
-                this.suspects,
-                currentItemList,
-                currentLocationList
+            // Set the choices
+            gameGuessGUIController.setSuspectChoiceBox(this.suspects);
+            gameGuessGUIController.setLocationChoice(
+                    this.currentLocation.getName()
             );
+            gameGuessGUIController.setItemChoice(this.currentItem.getName());
 
             // Show the dialog and wait until the user closes it
             dialogStage.showAndWait();
 
             if (gameGuessGUIController.userClickedGuess()) {
-                handleGuess(
-                    gameGuessGUIController.getSuspectChoiceBox(),
-                    gameGuessGUIController.getLocationChoiceBox(),
-                    gameGuessGUIController.getItemChoiceBox()
-                );
+                handleGuess(gameGuessGUIController.getSuspectChoiceBox());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,72 +191,48 @@ public class Game extends Application {
     /*****************************************************************
     Handle the users Guess
     *****************************************************************/
-    private void handleGuess(
-        final ChoiceBox<String> suspectChoiceBox,
-        final ChoiceBox<String> locationChoiceBox,
-        final ChoiceBox<String> itemChoiceBox
-    ) {
+    private void handleGuess(final ChoiceBox<String> suspectChoiceBox) {
         try {
             final String suspect_name = suspectChoiceBox
                 .getSelectionModel()
                 .getSelectedItem();
 
-            final String location_name = locationChoiceBox
-                .getSelectionModel()
-                .getSelectedItem();
-
-            final String item_name = itemChoiceBox
-                .getSelectionModel()
-                .getSelectedItem();
-
             int matches = 0;
 
-            for (GameObjectInterface gameObject : this.solution) {
-                if (gameObject.belongsTo(suspectChoiceBox) &&
-                    gameObject.getName().equals(suspect_name)
-                ) {
-                    this.gameGUIController.getSuspectGuess().setText(
-                        gameObject.getName()
-                    );
+            if (this.solution.containsKey(Suspect.class)) {
+                String correctSuspect = this.solution.get(Suspect.class);
 
-                    matches++;
-
-                    continue;
-                }
-
-                if (gameObject.belongsTo(locationChoiceBox) &&
-                    gameObject.getName().equals(location_name)
-                ) {
-                    this.gameGUIController.getLocationGuess().setText(
-                        gameObject.getName()
-                    );
-
-                    matches++;
-
-                    continue;
-                }
-
-                if (gameObject.belongsTo(itemChoiceBox) &&
-                    gameObject.getName().equals(item_name)
-                ) {
-                    this.gameGUIController.getItemGuess().setText(
-                        gameObject.getName()
-                    );
+                if(correctSuspect.equals(suspect_name)) {
+                    this.gameGUIController
+                        .getSuspectGuess()
+                        .setText(correctSuspect);
 
                     matches++;
                 }
             }
 
-            if (matches == 3) {
-                gameGUIController.setResults("You won!");
+            if (this.solution.containsKey(Suspect.class)) {
+                String correctLocation = this.solution.get(Suspect.class);
 
-                this.endGame();
+                if(correctLocation.equals(this.currentItem.getName())) {
+                    matches++;
+                }
+            }
+
+            if (this.solution.containsKey(Suspect.class)) {
+                String corecctSuspect = this.solution.get(Suspect.class);
+            }
+
+            if (matches == 3) {
+                gameGUIController.setResults(
+                    "<p>You have all three clues!</p>" +
+                    "<p>Click 'Solve' to end the game</p>"
+                );
             } else {
                 gameGUIController.setResults(
                     "Close. Keep playing to gather more clues"
                 );
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -419,10 +382,16 @@ public class Game extends Application {
     /*****************************************************************
     Look around and describe the current game world
     *****************************************************************/
-    void look(String lookResult) {
-        lookResult += "<p>You are ";
-        lookResult += this.currentLocation.getDescription().toLowerCase();
-        lookResult += ".</p>";
+    void look(String prefix) {
+        StringBuilder lookResult = new StringBuilder(prefix);
+
+        lookResult.append("<p>You are ");
+        lookResult.append(
+                this.currentLocation.getDescription().toLowerCase()
+        );
+
+        lookResult.append(".</p>");
+
 
         for (Map.Entry<String, Location> entry :
             this.currentLocation.getNeighbors().entrySet()
@@ -430,31 +399,33 @@ public class Game extends Application {
             String neighborDescription = this.currentLocation
                 .getNeighborDescription(entry.getValue());
 
-            lookResult += "<p>";
-            lookResult += neighborDescription;
-            lookResult += " is the ";
-            lookResult += entry.getValue().getName().toLowerCase();
-            lookResult += ".</p>";
+            lookResult.append("<p>");
+            lookResult.append(neighborDescription);
+            lookResult.append(" is the ");
+            lookResult.append(entry.getValue().getName().toLowerCase());
+            lookResult.append(".</p>");
         }
 
         if (this.currentLocation.isSolvable()) {
-            lookResult += "<p>In the room there is a ";
+            lookResult.append("<p>In the room there is a ");
 
-            lookResult += currentLocation
-                .getItem()
-                .getDescription()
-                .toLowerCase();
+            lookResult.append(
+                this.currentLocation
+                    .getItem()
+                    .getDescription()
+                    .toLowerCase()
+            );
 
-            lookResult += ".</p>";
+            lookResult.append(".</p>");
         }
 
         if (this.currentItem != null) {
-            lookResult += "<p>You are holding ";
-            lookResult += this.currentItem.getDescription();
-            lookResult += "</p>";
+            lookResult.append("<p>You are holding ");
+            lookResult.append(this.currentItem.getDescription());
+            lookResult.append("</p>");
         }
 
-        this.gameGUIController.setResults(lookResult);
+        this.gameGUIController.setResults(lookResult.toString());
     }
 
     /*****************************************************************
@@ -573,11 +544,24 @@ public class Game extends Application {
     *****************************************************************/
     private void setSolution() {
         try {
-            solution = new ArrayList<>();
+            this.solution = new HashMap<>();
 
-            solution.add(Suspect.getSolvableObject(suspectDao));
-            solution.add(Location.getSolvableObject(locationDao));
-            solution.add(Item.getSolvableObject(itemDao));
+            GameObjectInterface suspect =
+                    Suspect.getSolvableObject(this.suspectDao);
+
+            GameObjectInterface location =
+                    Location.getSolvableObject(this.locationDao);
+
+            GameObjectInterface item =
+                    Item.getSolvableObject(this.itemDao);
+
+            if (suspect == null || location == null || item == null) {
+                throw new Exception("Could not find valid game object");
+            }
+
+            this.solution.put(suspect, suspect.getName());
+            this.solution.put(location, location.getName());
+            this.solution.put(item, item.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }

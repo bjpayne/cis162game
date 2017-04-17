@@ -17,6 +17,9 @@ public interface GameObjectInterface {
     /** Get the object name */
     String getName();
 
-    /** Check if the guess is correct */
-    boolean belongsTo(final ChoiceBox<String> choice);
+    /** Use as a HashMap key */
+    int hashCode();
+
+    /** Check for equality */
+    boolean equals(Object object);
 }

@@ -77,12 +77,25 @@ public class Item implements GameObjectInterface {
         return name;
     }
 
+    /*****************************************************************
+    Get the items name
+    @return String The items name
+    *****************************************************************/
     @Override
     public boolean belongsTo(ChoiceBox<String> choice) {
         return choice.getId().equals("itemChoiceBox");
     }
 
-    public static GameObjectInterface getSolvableObject(
+    @Override
+    public boolean equals() {
+        return false;
+    }
+
+    /*****************************************************************
+    Get the items name
+    @return String The items name
+    *****************************************************************/
+    static GameObjectInterface getSolvableObject(
         final Dao<Item, Integer> dao
     ) {
         try {
