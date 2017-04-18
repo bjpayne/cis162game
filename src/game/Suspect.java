@@ -4,9 +4,9 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
+import javafx.scene.text.Text;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -23,6 +23,8 @@ public class Suspect implements GameObjectInterface {
     @DatabaseField()
     private String name;
 
+    /** The correct solution GUI field */
+    private Text solutionField;
 
     /*****************************************************************
     ORM Constructor
@@ -30,7 +32,7 @@ public class Suspect implements GameObjectInterface {
     public Suspect() {}
 
     /** Get a solvable game object */
-    static GameObjectInterface getSolvableObject(
+    static Suspect getSolvableObject(
         final Dao<Suspect, Integer> dao
     ) {
         try {
@@ -83,16 +85,9 @@ public class Suspect implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Check if the guess is correct
-    @return boolean whether its correct
+    Set the solution text GUI field
     *****************************************************************/
-    @Override
-    public boolean guess(
-        final Map.Entry<String, String> guess,
-        final String solution
-    ) {
-        return guess.getKey().equals("suspect") &&
-               guess.getValue().equals(solution);
-
+    public void setSolutionField(Text solutionField) {
+        this.solutionField = solutionField;
     }
 }

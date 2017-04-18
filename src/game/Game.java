@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -47,7 +48,12 @@ public class Game extends Application {
     private Dao<Suspect, Integer> suspectDao;
 
     /** The Correct Game Objects to solve the mystery */
-    private List<GameObjectInterface> solution;
+    private Suspect correctGameSuspect;
+    private Location correctGameLocation;
+    private Item correctGameItem;
+
+    /** Whether the mystery has been solved */
+    private boolean solved = false;
 
     /** The game suspects */
     private List<Suspect> suspects;
@@ -139,98 +145,13 @@ public class Game extends Application {
             // Fill the players health bar
             this.gameGUIController.getHealthBar().setProgress(1.0);
 
+            // Remove any previous guesses
+            this.gameGUIController.getSuspectGuess().setText("--");
+            this.gameGUIController.getLocationGuess().setText("--");
+            this.gameGUIController.getItemGuess().setText("--");
+
             // Set the game welcome message
             this.setWelcomeMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*****************************************************************
-    Set the guess button handler
-    *****************************************************************/
-    void guess() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("view/gameGuessGui.fxml")
-            );
-
-            AnchorPane page = loader.load();
-
-            // Create the dialog Stage.
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Edit Person");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(this.primaryStage);
-            Scene scene = new Scene(page);
-            dialogStage.setScene(scene);
-
-            // Get the controller
-            GameGuessGUI gameGuessGUIController = loader.getController();
-
-            gameGuessGUIController.setDialogStage(dialogStage);
-
-            // Set the choices
-            gameGuessGUIController.setSuspectChoiceBox(this.suspects);
-            gameGuessGUIController.setLocationChoice(
-                    this.currentLocation.getName()
-            );
-            gameGuessGUIController.setItemChoice(this.currentItem.getName());
-
-            // Show the dialog and wait until the user closes it
-            dialogStage.showAndWait();
-
-            if (gameGuessGUIController.userClickedGuess()) {
-                handleGuess(gameGuessGUIController.getSuspectChoiceBox());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*****************************************************************
-    Handle the users Guess
-    *****************************************************************/
-    private void handleGuess(final ChoiceBox<String> suspectChoiceBox) {
-        try {
-            final String suspectName = suspectChoiceBox
-                .getSelectionModel()
-                .getSelectedItem();
-
-            final String locationName = this.currentLocation.getName();
-
-            final String itemName = this.currentItem.getName();
-
-            HashMap<String, String> guesses = new HashMap<>();
-
-            guesses.put("suspect", suspectName);
-            guesses.put("location", suspectName);
-            guesses.put("item", suspectName);
-
-            int matches = 0;
-
-            for (GameObjectInterface gameObject : this.solution) {
-                final String gameObjectName = gameObject.getName();
-
-                for (Map.Entry<String, String> guess : guesses.entrySet()) {
-                    if(gameObject.guess(guess, gameObjectName)) {
-                        matches++;
-
-                        break;
-                    }
-                }
-            }
-
-            if (matches == 3) {
-                gameGUIController.setResults(
-                    "<p>You have all three clues!</p>" +
-                    "<p>Click 'Solve' to end the game at any time.</p>"
-                );
-            } else {
-                gameGUIController.setResults(
-                    "So close. Keep playing to gather more clues."
-                );
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -247,6 +168,7 @@ public class Game extends Application {
                 .getNeighbors()
                 .get(direction.toLowerCase());
 
+            // Check if the movement direction is valid
             if (neighbor == null) {
                 look(getErrorMessage("You cannot move " + direction + "."));
 
@@ -255,12 +177,14 @@ public class Game extends Application {
 
             Location newLocation = null;
 
+            // Check if the movement direction is valid
             for (Location location : locations) {
                 if (location.getId() == neighbor.getId()) {
                     newLocation = location;
                 }
             }
 
+            // If a location was not found
             if (newLocation == null) {
                 this.gameGUIController.setResults(
                     "Location not found. Please try again."
@@ -271,11 +195,24 @@ public class Game extends Application {
 
             this.currentLocation = newLocation;
 
-            if (! this.currentLocation.isSolvable()) {
-                gameGUIController.getButtonGuess().setDisable(true);
-            } else {
-                gameGUIController.getButtonGuess().setDisable(false);
+            // Remove 1 health points from player for every move
+            double health = this.gameGUIController.getHealthBar().getProgress();
+
+            health = ((health * 10) - .5) / 10;
+
+            if (health <= 0) {
+                this.gameGUIController.setResults(
+                    "<p>You ran out of health.</p>" +
+                    "<p>You must consume items found in the game " +
+                    "world to continue solving the mystery.</p>"
+                );
+
+                this.endGame();
+
+                return;
             }
+
+            this.gameGUIController.getHealthBar().setProgress(health);
 
             this.look("");
         } catch (Exception e) {
@@ -288,17 +225,12 @@ public class Game extends Application {
     *****************************************************************/
     void pickup() {
         try {
-            if (! this.currentLocation.isSolvable()) {
-                this.look(getErrorMessage("You cannot pickup an item here."));
-
-                return;
-            }
-
+            // If the player is already holding an item
             if (this.currentItem != null) {
                 this.gameGUIController.setResults(
-                    "<p>You are holding " +
+                    "<p><strong>You are holding " +
                     this.currentItem.getDescription() +
-                    "</p>"
+                    "</strong></p>"
                 );
 
                 return;
@@ -313,9 +245,9 @@ public class Game extends Application {
             this.currentItem = this.currentLocation.getItem();
 
             this.gameGUIController.setResults(
-                "You picked up " +
+                "<p>You picked up <strong>" +
                 this.currentItem.getDescription().toLowerCase() +
-                "."
+                "</strong>.</p>"
             );
 
             this.gameGUIController.getButtonGuess().setDisable(false);
@@ -328,22 +260,29 @@ public class Game extends Application {
     Eat the current item
     *****************************************************************/
     void drop() {
-        this.currentItem = null;
-
         // Re-enable all buttons
         for (Button button : this.gameGUIController.getButtons()) {
             button.setDisable(false);
         }
 
-        this.gameGUIController.setResults("<p>You dropped the item.</p>");
-
         this.gameGUIController.getButtonGuess().setDisable(true);
+
+        if (this.currentItem == null) {
+            return;
+        }
+
+        this.gameGUIController.setResults(
+            "<p>You dropped the " + this.currentItem.getName() + "</p>"
+        );
+
+        this.currentItem = null;
     }
 
     /*****************************************************************
     Eat the current item
     *****************************************************************/
     void eat() {
+        // If the player is not holding anything to eat
         if (this.currentItem == null) {
             this.gameGUIController.setResults(
                 "<p>You are not holding anything.<p>"
@@ -352,6 +291,7 @@ public class Game extends Application {
             return;
         }
 
+        // If what the player is holding is not edible
         if (! this.currentItem.isConsumable()) {
             this.gameGUIController.setResults(
                 "<p>No! You can't eat that.</p>"
@@ -360,6 +300,7 @@ public class Game extends Application {
             return;
         }
 
+        // One clue can be consumed, the poison. If consumed the game ends
         if (this.currentItem.isConsumable() && this.currentItem.isSolvable()) {
             this.gameGUIController.setResults(
                 "<p>You...you ate a clue. You're dead now.</p>"
@@ -372,9 +313,25 @@ public class Game extends Application {
             return;
         }
 
+        // Add the consumed health value to the players health
+        ProgressBar healthBar = this.gameGUIController.getHealthBar();
+        double currentHealth = healthBar.getProgress();
+        currentHealth += this.currentItem.getHealthValue() / 10;
+
         this.gameGUIController
             .getHealthBar()
-            .setProgress(this.currentItem.getHealthValue() / 10);
+            .setProgress(currentHealth);
+
+        String itemName = this.currentItem.getName();
+
+        this.drop();
+
+        this.currentLocation.removeItem();
+
+        this.gameGUIController.setResults(
+            "<p>You have consumed the " + itemName + "</p>" +
+            "<p>You are reinvigorated and ready to solve more crimes</p>"
+        );
     }
 
     /*****************************************************************
@@ -404,7 +361,7 @@ public class Game extends Application {
             lookResult.append(".</p>");
         }
 
-        if (this.currentLocation.isSolvable()) {
+        if (this.currentLocation.getItem() != null) {
             lookResult.append("<p>In the room there is a ");
 
             lookResult.append(
@@ -418,12 +375,150 @@ public class Game extends Application {
         }
 
         if (this.currentItem != null) {
-            lookResult.append("<p>You are holding ");
+            lookResult.append("<p><strong>You are holding ");
             lookResult.append(this.currentItem.getDescription());
-            lookResult.append("</p>");
+            lookResult.append("</strong></p>");
         }
 
         this.gameGUIController.setResults(lookResult.toString());
+    }
+
+    /*****************************************************************
+    Set the guess button handler
+    *****************************************************************/
+    void guess() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("view/gameGuessGui.fxml")
+            );
+
+            AnchorPane page = loader.load();
+
+            // Create the dialog Stage.
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit Person");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(this.primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Get the controller
+            GameGuessGUI gameGuessGUIController = loader.getController();
+
+            // Set the window owner
+            gameGuessGUIController.setDialogStage(dialogStage);
+
+            // Set the choices
+            gameGuessGUIController.setSuspectChoiceBox(this.suspects);
+
+            // If the player has already guessed the suspect set the choice box
+            if (this.correctGameSuspect.getName()
+                .equals(this.gameGUIController.getSuspectGuess().getText())
+            ) {
+                gameGuessGUIController
+                    .getSuspectChoiceBox()
+                    .getSelectionModel()
+                    .select(this.correctGameSuspect.getName()
+                );
+            }
+
+            gameGuessGUIController.setLocationChoice(
+                    this.currentLocation.getName()
+            );
+
+            if (this.currentItem != null) {
+                gameGuessGUIController.setItemChoice(this.currentItem.getName());
+            }
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+            if (gameGuessGUIController.userClickedGuess()) {
+                handleGuess(gameGuessGUIController.getSuspectChoiceBox());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*****************************************************************
+    Handle the users Guess
+    *****************************************************************/
+    private void handleGuess(final ChoiceBox<String> suspectChoiceBox) {
+        try {
+            final String suspectName = suspectChoiceBox
+                .getSelectionModel()
+                .getSelectedItem();
+
+            final String locationName = this.currentLocation.getName();
+
+            final String itemName = this.currentItem.getName();
+
+            int matches = 0;
+
+            if (this.correctGameSuspect.getName().equals(suspectName)) {
+                matches++;
+
+                this.gameGUIController.getSuspectGuess().setText(suspectName);
+            }
+
+            if (this.correctGameLocation.getName().equals(locationName)) {
+                matches++;
+
+                this.gameGUIController.getLocationGuess().setText(locationName);
+            }
+
+            if (this.correctGameItem.getName().equals(itemName)) {
+                matches++;
+
+                this.gameGUIController.getItemGuess().setText(itemName);
+            }
+
+            if (matches == 3) {
+                gameGUIController.setResults(
+                    "<p>You have all three clues!</p>" +
+                    "<p>Click 'Solve' to end the game at any time.</p>"
+                );
+
+                this.solved = true;
+            } else {
+                String results = (matches == 1) ? "clue" : "clues";
+
+                gameGUIController.setResults(
+                    "<p>You got " + matches + " " + results + "</p>" +
+                    "<p>Keep playing to gather more clues.</p>"
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*****************************************************************
+    Solve and end the game.
+    *****************************************************************/
+    void solve() {
+        if (this.solved) {
+            String result = "";
+
+            result +=
+                "<p>Congratulations! You solved the mystery!</p>" +
+                "<p>It was <strong>" +
+                this.correctGameSuspect.getName() +
+                "</strong> with the <strong>" +
+                this.correctGameItem +
+                "</strong> in the <strong>" +
+                this.correctGameLocation.getName() +
+                "</strong>.</p>";
+
+            this.gameGUIController.setResults(result);
+
+            this.endGame();
+        } else {
+            this.gameGUIController
+                .setResults("<p>Continue gathering clues to " +
+                    "solve the mystery</p>");
+        }
     }
 
     /*****************************************************************
@@ -433,6 +528,8 @@ public class Game extends Application {
         for (Button button : this.gameGUIController.getButtons()) {
             button.setDisable(true);
         }
+
+        this.gameGUIController.getHealthBar().setProgress(0);
     }
 
     /*****************************************************************
@@ -510,25 +607,44 @@ public class Game extends Application {
 
             List<Item> solvableItems = new ArrayList<>();
 
+            List<Location> nonSolvableLocations = new ArrayList<>();
+
+            List<Item> nonSolvableItems = new ArrayList<>();
+
             this.locations.forEach((Location location) -> {
                 if (location.isSolvable()) {
                     solvableLocations.add(location);
+                } else {
+                    nonSolvableLocations.add(location);
                 }
             });
 
             this.items.forEach((Item item) -> {
                 if (item.isSolvable()) {
                     solvableItems.add(item);
+                } else if (! item.isSolvable() && item.isConsumable()) {
+                    nonSolvableItems.add(item);
                 }
             });
 
             // Shuffle the items so they are random
             Collections.shuffle(solvableItems, new Random(System.nanoTime()));
+            Collections.shuffle(nonSolvableItems, new Random(System.nanoTime()));
 
             int index = 0;
 
+            // Add the solvable items to the main rooms
             for (Location location : solvableLocations) {
                 location.addItem(solvableItems.get(index));
+
+                index++;
+            }
+
+            index = 0;
+
+            // Add the non solvable items to the hallways
+            for (Location location : nonSolvableLocations) {
+                location.addItem(nonSolvableItems.get(index));
 
                 index++;
             }
@@ -542,24 +658,12 @@ public class Game extends Application {
     *****************************************************************/
     private void setSolution() {
         try {
-            this.solution = new ArrayList<>();
+            this.correctGameSuspect = Suspect.getSolvableObject(this.suspectDao);
 
-            GameObjectInterface suspect =
-                    Suspect.getSolvableObject(this.suspectDao);
-
-            GameObjectInterface location =
+            this.correctGameLocation =
                     Location.getSolvableObject(this.locationDao);
 
-            GameObjectInterface item =
-                    Item.getSolvableObject(this.itemDao);
-
-            if (suspect == null || location == null || item == null) {
-                throw new Exception("Could not find valid game object");
-            }
-
-            this.solution.add(suspect);
-            this.solution.add(location);
-            this.solution.add(item);
+            this.correctGameItem = Item.getSolvableObject(this.itemDao);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -605,4 +709,5 @@ public class Game extends Application {
     private String getErrorMessage(String message) {
         return "<p class='error'><strong>" + message + "</strong></p>";
     }
+
 }

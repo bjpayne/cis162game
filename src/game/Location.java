@@ -4,12 +4,10 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.text.Text;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -41,7 +39,11 @@ public class Location implements GameObjectInterface {
     /** The locations neighbors */
     private HashMap<String, Location> neighbors;
 
+    /** The location neighbor description */
     private HashMap<Location, String> neighborDescription;
+
+    /** The correct solution GUI field */
+    private Text solutionField;
 
     /** Query builder accessors */
     private static final String SOLVABLE = "solvable";
@@ -56,7 +58,7 @@ public class Location implements GameObjectInterface {
     @param dao The items description.
     @return GameObjectInterface
     *****************************************************************/
-    static GameObjectInterface getSolvableObject(
+    static Location getSolvableObject(
         final Dao<Location, Integer> dao
     ) {
         try {
@@ -109,6 +111,13 @@ public class Location implements GameObjectInterface {
     }
 
     /*****************************************************************
+    Add an item to the location
+    *****************************************************************/
+    void removeItem() {
+        this.item = null;
+    }
+
+    /*****************************************************************
     Initialize the neighbors property
     *****************************************************************/
     void initNeighbors() {
@@ -157,24 +166,17 @@ public class Location implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Check if the guess is correct
-    @return boolean whether its correct
-    *****************************************************************/
-    @Override
-    public boolean guess(
-        final Map.Entry<String, String> guess,
-        final String solution
-    ) {
-        return guess.getKey().equals("location") &&
-               guess.getValue().equals(solution);
-
-    }
-
-    /*****************************************************************
     Get whether the location can solve the mystery
     @return boolean is the location solvable
     *****************************************************************/
     boolean isSolvable() {
         return solvable;
+    }
+
+    /*****************************************************************
+    Set the solution text GUI field
+    *****************************************************************/
+    public void setSolutionField(Text solutionField) {
+        this.solutionField = solutionField;
     }
 }

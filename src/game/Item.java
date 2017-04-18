@@ -4,11 +4,9 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.text.Text;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /*****************************************************************
@@ -46,6 +44,9 @@ public class Item implements GameObjectInterface {
     @DatabaseField()
     private boolean solvable;
 
+    /** The correct solution GUI field */
+    private Text solutionField;
+
     /** Query builder accessors */
     static final String SOLVABLE = "solvable";
     static final String NAME = "name";
@@ -80,24 +81,10 @@ public class Item implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Check if the guess is correct
-    @return boolean whether its correct
-    *****************************************************************/
-    @Override
-    public boolean guess(
-        final Map.Entry<String, String> guess,
-        final String solution
-    ) {
-        return guess.getKey().equals("item") &&
-               guess.getValue().equals(solution);
-
-    }
-
-    /*****************************************************************
     Get the solvable object for this type
-    @return String The items name
+    @return Item the correct game item
     *****************************************************************/
-    static GameObjectInterface getSolvableObject(
+    static Item getSolvableObject(
         final Dao<Item, Integer> dao
     ) {
         try {
@@ -203,5 +190,12 @@ public class Item implements GameObjectInterface {
     *****************************************************************/
     public void setSolvable(final boolean solvable) {
         this.solvable = solvable;
+    }
+
+    /*****************************************************************
+    Set the solution text GUI field
+    *****************************************************************/
+    public void setSolutionField(Text solutionField) {
+        this.solutionField = solutionField;
     }
 }

@@ -139,7 +139,9 @@ public class GameGUI {
     /*****************************************************************
     Solve the murder
     ******************************************************************/
-    @FXML protected void solve() {}
+    @FXML protected void solve() {
+        this.game.solve();
+    }
 
     /*****************************************************************
     Start a new game
