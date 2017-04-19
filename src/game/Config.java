@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /*****************************************************************
-Model the suspects table.
+Model the config table
 @author Ben Payne
 @version 4/4/2017.
 ******************************************************************/
