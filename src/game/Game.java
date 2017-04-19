@@ -26,7 +26,6 @@ A simple game of clue
 @version 4/4/2017.
 ******************************************************************/
 public class Game extends Application {
-
     /** The gameGUI controller */
     private GameGUI gameGUIController = null;
 
@@ -131,10 +130,7 @@ public class Game extends Application {
     void createGameWorld() {
         try {
             // Cache the game objects
-            this.suspects  = this.suspectDao.queryForAll();
-            this.locations = this.locationDao.queryForAll();
-            this.items     = this.itemDao.queryForAll();
-
+            cacheTheGameObjects();
 
             // Get a random location based on the table size
             this.setLocation((new Random()).nextInt(this.locations.size()));
@@ -161,6 +157,15 @@ public class Game extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /*****************************************************************
+    Cache the game world objects
+    *****************************************************************/
+    void cacheTheGameObjects() throws SQLException {
+        this.suspects  = this.suspectDao.queryForAll();
+        this.locations = this.locationDao.queryForAll();
+        this.items     = this.itemDao.queryForAll();
     }
 
     /*****************************************************************
@@ -613,7 +618,7 @@ public class Game extends Application {
     /*****************************************************************
     Set the game world locations neighbors
     *****************************************************************/
-    private void setLocationsNeighbors() {
+    void setLocationsNeighbors() {
         // Loop through all the locations
         this.locations.forEach((Location location) -> {
             try {
@@ -656,7 +661,7 @@ public class Game extends Application {
     /*****************************************************************
     Set the game world locations items
     *****************************************************************/
-    private void setLocationsItems() {
+    void setLocationsItems() {
         try {
             // Get the solvable game objects
             List<Location> solvableLocations = new ArrayList<>();
@@ -752,9 +757,9 @@ public class Game extends Application {
     }
 
     /*****************************************************************
-     Setup the data access objects
-     *****************************************************************/
-    private void initDataAccessObjects() throws SQLException {
+    Setup the data access objects
+    *****************************************************************/
+    void initDataAccessObjects() throws SQLException {
         try {
             locationDao = DaoManager.createDao(getDbSource(), Location.class);
 
@@ -801,10 +806,58 @@ public class Game extends Application {
     }
 
     /*****************************************************************
-    Get a file resource
-    @return URI the file resource
-    *****************************************************************/
+     Get a file resource
+     @return URI the file resource
+     *****************************************************************/
     URI getUri(final String path) throws URISyntaxException {
         return this.getClass().getResource(path).toURI();
+    }
+
+    /*****************************************************************
+    Get the game suspects
+    @return the list of suspects
+    *****************************************************************/
+    List<Suspect> getSuspects() {
+        return suspects;
+    }
+
+    /*****************************************************************
+    Get the game locations
+    @return the list of locations
+    *****************************************************************/
+    List<Location> getLocations() {
+        return locations;
+    }
+
+    /*****************************************************************
+    Get the game items
+    @return the list of items
+    *****************************************************************/
+    List<Item> getItems() {
+        return items;
+    }
+
+    /*****************************************************************
+    Get the correct game suspect
+    @return the suspect
+    *****************************************************************/
+    Suspect getCorrectGameSuspect() {
+        return correctGameSuspect;
+    }
+
+    /*****************************************************************
+    Get the correct game location
+    @return the correct game location
+    *****************************************************************/
+    Location getCorrectGameLocation() {
+        return correctGameLocation;
+    }
+
+    /*****************************************************************
+    Get the correct game item
+    @return the correct game item
+    *****************************************************************/
+    Item getCorrectGameItem() {
+        return correctGameItem;
     }
 }
