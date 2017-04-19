@@ -8,6 +8,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /*****************************************************************
 Handle the events for the GUI.
@@ -25,6 +27,36 @@ class MarkdownParser {
             Path path = Paths.get(fileName);
 
             String content = new String(Files.readAllBytes(path));
+
+            return render(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    /*****************************************************************
+    Parse a markdown file to HTML with placeholder values
+    @param fileName the assets file to read
+    @return String the parsed markdown file
+    ******************************************************************/
+    static String parse(
+        final URI fileName,
+        HashMap<String, String> placeholderValues
+    ) {
+        try {
+            Path path = Paths.get(fileName);
+
+            String content = new String(Files.readAllBytes(path));
+
+            for (Map.Entry<String, String> placeholderValue :
+                placeholderValues.entrySet()
+            ) {
+                content = content.replace(
+                    placeholderValue.getKey(), placeholderValue.getValue()
+                );
+            }
 
             return render(content);
         } catch (Exception e) {

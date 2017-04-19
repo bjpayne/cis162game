@@ -32,7 +32,6 @@ public class LocationNeighbors {
 
     /** Query builder accessors */
     static final String LOCATION_ID = "location_id";
-    static final String NEIGHBOR_ID = "neighbor_id";
 
     /*****************************************************************
     Model Constructor
@@ -56,34 +55,18 @@ public class LocationNeighbors {
     }
 
     /*****************************************************************
-    Set the  id
-    @param location_id the locations id
-    *****************************************************************/
-    public void setLocationId(final int location_id) {
-        this.location_id = location_id;
-    }
-
-    /*****************************************************************
     Get the neighboring  id
     @return int the neighboring locations id
     *****************************************************************/
-    public int getNeighborId() {
+    int getNeighborId() {
         return neighbor_id;
-    }
-
-    /*****************************************************************
-    Set the  neighbor ID
-    @param neighbor_id the neighbors Id
-    *****************************************************************/
-    public void setNeighborId(final int neighbor_id) {
-        this.neighbor_id = neighbor_id;
     }
 
     /*****************************************************************
     Get the  neighbor relationship description
     @return String the  neighbor relationship description
     *****************************************************************/
-    public String getDescription() {
+    String getDescription() {
         return this.description;
     }
 
@@ -99,15 +82,7 @@ public class LocationNeighbors {
     Get the direction data
     @return String the direction data
     *****************************************************************/
-    public String getDirection() {
+    String getDirection() {
         return this.direction;
-    }
-
-    /*****************************************************************
-    Get the direction data
-    @param direction the direction data
-    *****************************************************************/
-    public void setDirection(final String direction) {
-        this.direction = direction;
     }
 }

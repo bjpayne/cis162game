@@ -4,7 +4,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Random;
@@ -44,12 +43,8 @@ public class Item implements GameObjectInterface {
     @DatabaseField()
     private boolean solvable;
 
-    /** The correct solution GUI field */
-    private Text solutionField;
-
     /** Query builder accessors */
-    static final String SOLVABLE = "solvable";
-    static final String NAME = "name";
+    private static final String SOLVABLE = "solvable";
 
     /*****************************************************************
     Model Constructor
@@ -62,14 +57,6 @@ public class Item implements GameObjectInterface {
     *****************************************************************/
     public long getId() {
         return this.id;
-    }
-
-    /*****************************************************************
-    Get the items id
-    @param id The items id
-    *****************************************************************/
-    public void setId(final long id) {
-        this.id = id;
     }
 
     /*****************************************************************
@@ -105,97 +92,34 @@ public class Item implements GameObjectInterface {
     }
 
     /*****************************************************************
-    Set the items name
-    @param name The items name
-    *****************************************************************/
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /*****************************************************************
     Set the items description
     @return String the items description
     *****************************************************************/
-    public String getDescription() {
+    String getDescription() {
         return description;
-    }
-
-    /*****************************************************************
-    Set the items description
-    @param description the items description
-    *****************************************************************/
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /*****************************************************************
     Check whether the item is edible
     @return boolean whether the item is edible
     *****************************************************************/
-    public boolean isConsumable() {
+    boolean isConsumable() {
         return this.isConsumable;
-    }
-
-    /*****************************************************************
-    Set whether the item is consumable
-    @param isConsumable whether the item is consumable
-    *****************************************************************/
-    public void isConsumable(final boolean isConsumable) {
-        this.isConsumable = isConsumable;
-    }
-
-    /*****************************************************************
-    Set whether the item is consumable
-    @return boolean whether the item is pickable
-    *****************************************************************/
-    public boolean getIsPickable() {
-        return this.isPickable;
-    }
-
-    /*****************************************************************
-    Set whether the item is pickable
-    @param isPickable whether the item is pickable
-    *****************************************************************/
-    public void setIsPickable(final boolean isPickable) {
-        this.isPickable = isPickable;
     }
 
     /*****************************************************************
     Get the items health value
     @return int the items health value
     *****************************************************************/
-    public int getHealthValue() {
+    int getHealthValue() {
         return this.healthValue;
-    }
-
-    /*****************************************************************
-    Set the items health value
-    @param healthValue the items health value
-    *****************************************************************/
-    public void setHealthValue(final int healthValue) {
-        this.healthValue = healthValue;
     }
 
     /*****************************************************************
     Get whether the item can solve the mystery
     @return boolean whether the item solved the mystery
     *****************************************************************/
-    public boolean isSolvable() {
+    boolean isSolvable() {
         return solvable;
-    }
-
-    /*****************************************************************
-    Set the items health value
-    @param solvable whether the item solves the mystery
-    *****************************************************************/
-    public void setSolvable(final boolean solvable) {
-        this.solvable = solvable;
-    }
-
-    /*****************************************************************
-    Set the solution text GUI field
-    *****************************************************************/
-    public void setSolutionField(Text solutionField) {
-        this.solutionField = solutionField;
     }
 }

@@ -10,6 +10,7 @@ import javafx.scene.web.WebView;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*****************************************************************
 Handle the events for the GUI.
@@ -126,7 +127,7 @@ public class GameGUI {
     Look around
     ******************************************************************/
     @FXML protected void look() {
-        this.game.look("");
+        this.game.look(new StringBuilder());
     }
 
     /*****************************************************************
@@ -175,11 +176,9 @@ public class GameGUI {
     ******************************************************************/
     @FXML protected void about() {
         try {
-            URI path = getClass()
-                .getResource("assets/about.md")
-                .toURI();
-
-            this.setResults(path);
+            this.setResults(
+                this.game.getUri("assets/about.md")
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,7 +195,7 @@ public class GameGUI {
     }
 
     /*****************************************************************
-    Set the results, optionally parsing markdown
+    Set the results from a md file
     @param path the path to parse
     ******************************************************************/
     void setResults(final URI path) {
@@ -204,6 +203,21 @@ public class GameGUI {
 
         this.results.getEngine().loadContent(results);
     }
+
+    /*****************************************************************
+    Set the results, optionally passing in a set of placeholders
+    @param path the path to parse
+    ******************************************************************/
+    void setResults(
+        final URI path,
+        HashMap<String, String> placeholderValues
+    ) {
+        String results = MarkdownParser.parse(path, placeholderValues);
+
+        this.results.getEngine().loadContent(results);
+    }
+
+
 
     /*****************************************************************
     Get the buttons
@@ -235,42 +249,42 @@ public class GameGUI {
     /*****************************************************************
     Get the progress bar
     ******************************************************************/
-    public ProgressBar getHealthBar() {
+    ProgressBar getHealthBar() {
         return this.healthBar;
     }
 
     /*****************************************************************
     Get the guess button
     ******************************************************************/
-    public Button getButtonGuess() {
+    Button getButtonGuess() {
         return buttonGuess;
     }
 
     /*****************************************************************
     Get the suspect guess text field
     ******************************************************************/
-    public Text getSuspectGuess() {
+    Text getSuspectGuess() {
         return suspectGuess;
     }
 
     /*****************************************************************
     Get the location guess text field
     ******************************************************************/
-    public Text getLocationGuess() {
+    Text getLocationGuess() {
         return locationGuess;
     }
 
     /*****************************************************************
     Get the item guess text field
     ******************************************************************/
-    public Text getItemGuess() {
+    Text getItemGuess() {
         return itemGuess;
     }
 
     /*****************************************************************
     Get the item guess text field
     ******************************************************************/
-    public Button[] getMovementButtons() {
+    Button[] getMovementButtons() {
         return new Button[] {buttonUp, buttonDown, buttonLeft, buttonRight};
     }
 }

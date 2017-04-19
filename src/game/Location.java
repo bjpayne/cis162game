@@ -4,7 +4,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.text.Text;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +40,6 @@ public class Location implements GameObjectInterface {
 
     /** The location neighbor description */
     private HashMap<Location, String> neighborDescription;
-
-    /** The correct solution GUI field */
-    private Text solutionField;
 
     /** Query builder accessors */
     private static final String SOLVABLE = "solvable";
@@ -171,12 +167,5 @@ public class Location implements GameObjectInterface {
     *****************************************************************/
     boolean isSolvable() {
         return solvable;
-    }
-
-    /*****************************************************************
-    Set the solution text GUI field
-    *****************************************************************/
-    public void setSolutionField(Text solutionField) {
-        this.solutionField = solutionField;
     }
 }

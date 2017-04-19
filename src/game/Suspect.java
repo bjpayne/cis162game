@@ -4,7 +4,6 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
-import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Random;
@@ -22,9 +21,6 @@ public class Suspect implements GameObjectInterface {
     /** The Characters name */
     @DatabaseField()
     private String name;
-
-    /** The correct solution GUI field */
-    private Text solutionField;
 
     /*****************************************************************
     ORM Constructor
@@ -52,7 +48,7 @@ public class Suspect implements GameObjectInterface {
 
     /*****************************************************************
     Get the suspect primary key
-    @return String the characters name
+    @return long the primary key
     *****************************************************************/
     public long getId() {
         return id;
@@ -64,30 +60,5 @@ public class Suspect implements GameObjectInterface {
     *****************************************************************/
     public String getName() {
         return name;
-    }
-
-    /*****************************************************************
-    Use as a key
-    @return boolean whether its correct
-    *****************************************************************/
-    @Override
-    public int hashCode() {
-        return (int) this.getId();
-    }
-
-    /*****************************************************************
-    Use as a key
-    @return boolean whether its correct
-    *****************************************************************/
-    @Override
-    public boolean equals(Object object) {
-        return this.getClass() == object.getClass();
-    }
-
-    /*****************************************************************
-    Set the solution text GUI field
-    *****************************************************************/
-    public void setSolutionField(Text solutionField) {
-        this.solutionField = solutionField;
     }
 }
